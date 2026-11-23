@@ -28,6 +28,7 @@ class ChatApiTest {
    org.junit.jupiter.api.Assertions.assertTrue(prompt.getValue().contains("1945年4月23日"));
    org.junit.jupiter.api.Assertions.assertTrue(prompt.getValue().contains("RELATED_TO_EVENT"));
    org.junit.jupiter.api.Assertions.assertTrue(prompt.getValue().contains("中国共产党第七次全国代表大会"));
+   org.junit.jupiter.api.Assertions.assertFalse(prompt.getValue().contains("张思德追悼会"),"unrelated two-hop event must not contaminate the selected attraction context");
  }
  @Test void unrecognizedQuestionReturnsInsufficientEvidenceWithoutCallingModel() throws Exception {
    mvc.perform(post("/api/chat").contentType(MediaType.APPLICATION_JSON).content("{\"question\":\"北京天气如何\"}"))
@@ -58,5 +59,11 @@ class ChatApiTest {
    mvc.perform(post("/api/chat").contentType(MediaType.APPLICATION_JSON).content("{\"question\":\"杨家岭的故事\"}"))
     .andExpect(status().isServiceUnavailable()).andExpect(jsonPath("$.status").value("unavailable"))
     .andExpect(jsonPath("$.message").value("模型密钥未配置"));
+ }
+ @Test void sharedPersonDoesNotMakeUnrelatedSiteMatchAnEvent() throws Exception {
+   when(llm.generate(anyString(),anyString())).thenReturn("相关历史。");
+   mvc.perform(post("/api/chat").contentType(MediaType.APPLICATION_JSON).content("{\"question\":\"张思德追悼会的经过\"}"))
+    .andExpect(status().isOk()).andExpect(jsonPath("$.attractions.length()").value(1))
+    .andExpect(jsonPath("$.attractions[0].name").value("枣园革命旧址"));
  }
 }

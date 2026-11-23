@@ -7,7 +7,7 @@ Vue 3 + Spring Boot + Neo4j 的毕业设计项目。当前收录延安市和榆�
 - 按地区浏览景点，结合主题和用户选择的人物、事件、著作或文化主题进行图谱推荐。
 - 景点、地区、历史事件、人物、著作和主题实体及其关系存储在 Neo4j；提供可拖动、缩放、点击和按类别筛选的关系图，也提供键盘可操作的清单。
 - 每个景点单独配有插画和分段历史故事；每个故事段落附有资料来源。
-- 智能问答基于已整理的故事和 Neo4j 关系检索，并使用免费模型生成回答；展示检索来源。
+- 智能问答基于已整理的故事和 Neo4j 关系检索，并使用 DeepSeek 模型生成回答；展示检索来源。
 
 推荐按照当前用户主动选择的条件计算，尚无登录、长期兴趣画像或行为数据；尚未实现用户系统、MySQL、路线规划和后台管理。目前榆林收录杨家沟革命旧址和小河会议旧址，覆盖范围仍可继续扩展。
 
@@ -42,12 +42,12 @@ Vue 3 + Spring Boot + Neo4j 的毕业设计项目。当前收录延安市和榆�
 
 ## 大模型问答
 
-问答使用 OpenRouter 的 `openrouter/free` 免费路由，不自动切换付费模型。它按请求选择可用的免费模型，因此具体模型、响应效果和可用性可能变化；免费额度与限速以 [OpenRouter 官方说明](https://openrouter.ai/collections/free-models/) 为准。服务商需要 API 密钥，申请地址：[OpenRouter API Keys](https://openrouter.ai/settings/keys)。项目不包含密钥；密钥只能保存在服务器环境变量，不要提交到仓库或发给他人。
+问答使用 DeepSeek 官方 API 的 `deepseek-flash`，关闭思考模式以控制响应时间和输出。**DeepSeek API 按 token 计费，不保证免费**；赠送额度与余额以账户实际情况为准，价格请查看 [DeepSeek 官方定价](https://api-docs.deepseek.com/quick_start/pricing/)。项目不包含密钥；密钥只能保存在服务器环境变量，不要提交到仓库或发给他人。
 
 在启动后端的 PowerShell 终端中设置（输入时不回显），然后运行 `mvn spring-boot:run`：
 
 ```powershell
-$env:OPENROUTER_API_KEY = [System.Net.NetworkCredential]::new('', (Read-Host '输入 OpenRouter API 密钥' -AsSecureString)).Password
+$env:DEEPSEEK_API_KEY = [System.Net.NetworkCredential]::new('', (Read-Host '输入 DeepSeek API 密钥' -AsSecureString)).Password
 mvn spring-boot:run
 ```
 
@@ -59,7 +59,7 @@ mvn spring-boot:run
 
 `attractionId` 可省略，系统会按景点名称、常用简称或图谱人物/事件名称匹配，最多处理三个景点；未匹配、范围过宽或询问未核实的开放时间、票价等实时信息时，直接说明资料不足，不调用大模型。后台把已整理的故事段落及相关图谱关系发送给模型，并由服务器返回实际检索到的来源链接。来源是回答所使用的资料集合，不等于对每句话逐一校验；模型仍可能出错，重要历史事实应核查原始来源。当前故事是已核验资料的分段梳理，无法保证囊括所有史料。
 
-问题和检索资料会发送到 OpenRouter 及其模型提供方，请勿输入敏感个人信息。每次请求独立，不传入先前聊天记录；页面记录仅保存在当前页面内。示例及测试不包含真实密钥；网关单元测试使用模拟响应，不代表真实服务已连通。
+问题和检索资料会发送到 DeepSeek，请勿输入敏感个人信息。每次请求独立，不传入先前聊天记录；页面记录仅保存在当前页面内。示例及测试不包含真实密钥；网关单元测试使用模拟响应，不代表真实服务已连通。
 
 ## 历史故事维护
 
