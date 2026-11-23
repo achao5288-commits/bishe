@@ -12,7 +12,7 @@ class ExpandedGraphTest {
  @Autowired MockMvc mvc;
  @Test void includesYulinSitesWithDistinctIllustrations() throws Exception {
    mvc.perform(get("/api/attractions").param("region", "榆林"))
-      .andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(3))
+      .andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(5))
       .andExpect(jsonPath("$[0].name").value("杨家沟革命旧址"))
       .andExpect(jsonPath("$[1].name").value("小河会议旧址"));
  }

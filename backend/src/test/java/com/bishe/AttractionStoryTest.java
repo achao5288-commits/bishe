@@ -11,7 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AttractionStoryTest {
  @Autowired MockMvc mvc;
  @Test void eachAttractionHasThreeSourcedStorySections() throws Exception {
-  for(int id=1;id<=12;id++) mvc.perform(get("/api/attractions/"+id+"/story"))
+  for(int id=1;id<=16;id++) mvc.perform(get("/api/attractions/"+id+"/story"))
    .andExpect(status().isOk()).andExpect(jsonPath("$.attractionId").value(id))
    .andExpect(jsonPath("$.sections.length()").value(3))
    .andExpect(jsonPath("$.sections[0].title").isNotEmpty())

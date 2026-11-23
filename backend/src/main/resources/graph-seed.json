@@ -160,6 +160,62 @@
       "aliases": [
         "神泉堡"
       ]
+    },
+    {
+      "id": 13,
+      "name": "洛川会议纪念馆",
+      "region": "延安",
+      "theme": "纪念馆",
+      "description": "纪念1937年洛川会议，展示全民族抗战初期的重要历史。",
+      "image": "/images/luochuan.png",
+      "sourceName": "文化和旅游部",
+      "sourceUrl": "https://zhuanti.mct.gov.cn/dhxlsfn2022shanxi2/detail/2499.html",
+      "aliases": [
+        "洛川会议",
+        "洛川纪念馆"
+      ]
+    },
+    {
+      "id": 14,
+      "name": "绥德县革命历史纪念馆",
+      "region": "榆林",
+      "theme": "纪念馆",
+      "description": "依托三五九旅绥德警备区旧址，展示绥德革命历史。",
+      "image": "/images/suide.png",
+      "sourceName": "绥德县纪委监委",
+      "sourceUrl": "https://suide.qinfeng.gov.cn/info/1046/2407.htm",
+      "aliases": [
+        "绥德革命历史纪念馆",
+        "绥德纪念馆"
+      ]
+    },
+    {
+      "id": 15,
+      "name": "郝家桥红色革命教育基地",
+      "region": "榆林",
+      "theme": "革命旧址",
+      "description": "以郝家桥调查和边区农村生产为线索，保存多处旧居旧址。",
+      "image": "/images/haojiaqiao.png",
+      "sourceName": "文化和旅游部",
+      "sourceUrl": "https://www.mct.gov.cn/wlbphone/wlbydd/xxfb/qglb/sx_9787/202104/t20210426_923965.html",
+      "aliases": [
+        "郝家桥",
+        "郝家桥旧址"
+      ]
+    },
+    {
+      "id": 16,
+      "name": "刘志丹烈士陵园",
+      "region": "延安",
+      "theme": "红色地标",
+      "description": "纪念西北红军和陕甘边革命根据地主要创建人之一刘志丹。",
+      "image": "/images/liuzhidan.png",
+      "sourceName": "陕西纪检监察网",
+      "sourceUrl": "https://www.qinfeng.gov.cn/info/4766/205366.htm",
+      "aliases": [
+        "刘志丹陵园",
+        "志丹烈士陵园"
+      ]
     }
   ],
   "events": [
@@ -222,6 +278,26 @@
       "id": "event-shenquanbao",
       "name": "中共中央机关驻神泉堡",
       "sourceUrl": "https://www.ylzf.gov.cn/newsinfo/1576403.html"
+    },
+    {
+      "id": "event-luochuan",
+      "name": "洛川会议",
+      "sourceUrl": "https://zhuanti.mct.gov.cn/dhxlsfn2022shanxi2/detail/2499.html"
+    },
+    {
+      "id": "event-suide-garrison",
+      "name": "三五九旅绥德警备区",
+      "sourceUrl": "https://suide.qinfeng.gov.cn/info/1046/2407.htm"
+    },
+    {
+      "id": "event-haojiaqiao",
+      "name": "郝家桥调查与农村生产",
+      "sourceUrl": "https://www.mct.gov.cn/wlbphone/wlbydd/xxfb/qglb/sx_9787/202104/t20210426_923965.html"
+    },
+    {
+      "id": "event-liuzhidan",
+      "name": "刘志丹与陕甘边革命根据地",
+      "sourceUrl": "https://www.qinfeng.gov.cn/info/4766/205366.htm"
     }
   ],
   "links": [
@@ -284,6 +360,26 @@
       "attractionId": 12,
       "eventId": "event-shenquanbao",
       "sourceUrl": "https://www.ylzf.gov.cn/newsinfo/1576403.html"
+    },
+    {
+      "attractionId": 13,
+      "eventId": "event-luochuan",
+      "sourceUrl": "https://zhuanti.mct.gov.cn/dhxlsfn2022shanxi2/detail/2499.html"
+    },
+    {
+      "attractionId": 14,
+      "eventId": "event-suide-garrison",
+      "sourceUrl": "https://suide.qinfeng.gov.cn/info/1046/2407.htm"
+    },
+    {
+      "attractionId": 15,
+      "eventId": "event-haojiaqiao",
+      "sourceUrl": "https://www.mct.gov.cn/wlbphone/wlbydd/xxfb/qglb/sx_9787/202104/t20210426_923965.html"
+    },
+    {
+      "attractionId": 16,
+      "eventId": "event-liuzhidan",
+      "sourceUrl": "https://www.qinfeng.gov.cn/info/4766/205366.htm"
     }
   ],
   "entities": [
@@ -352,6 +448,36 @@
       "name": "长征",
       "kind": "Theme",
       "sourceUrl": "https://yanan.qinfeng.gov.cn/info/1217/25277.htm"
+    },
+    {
+      "id": "person-wangzhen",
+      "name": "王震",
+      "kind": "Person",
+      "sourceUrl": "https://suide.qinfeng.gov.cn/info/1046/2407.htm"
+    },
+    {
+      "id": "person-xizhongxun",
+      "name": "习仲勋",
+      "kind": "Person",
+      "sourceUrl": "https://www.mct.gov.cn/wlbphone/wlbydd/xxfb/qglb/sx_9787/202104/t20210426_923965.html"
+    },
+    {
+      "id": "person-liuyuhou",
+      "name": "刘玉厚",
+      "kind": "Person",
+      "sourceUrl": "https://www.mct.gov.cn/wlbphone/wlbydd/xxfb/qglb/sx_9787/202104/t20210426_923965.html"
+    },
+    {
+      "id": "person-liuzhidan",
+      "name": "刘志丹",
+      "kind": "Person",
+      "sourceUrl": "https://www.qinfeng.gov.cn/info/4766/205366.htm"
+    },
+    {
+      "id": "work-ten-point",
+      "name": "抗日救国十大纲领",
+      "kind": "Work",
+      "sourceUrl": "https://m.ccdi.gov.cn/content/0a/20/5338.html"
     }
   ],
   "relations": [
@@ -474,6 +600,66 @@
       "end": "work-pla-declaration",
       "type": "RELATED_TO_WORK",
       "sourceUrl": "https://www.qinfeng.gov.cn/info/3632/151087.htm"
+    },
+    {
+      "start": "attraction-13",
+      "end": "person-mao",
+      "type": "RELATED_TO_PERSON",
+      "sourceUrl": "https://m.ccdi.gov.cn/content/0a/20/5338.html"
+    },
+    {
+      "start": "event-luochuan",
+      "end": "work-ten-point",
+      "type": "RELATED_TO_WORK",
+      "sourceUrl": "https://m.ccdi.gov.cn/content/0a/20/5338.html"
+    },
+    {
+      "start": "attraction-14",
+      "end": "person-wangzhen",
+      "type": "RELATED_TO_PERSON",
+      "sourceUrl": "https://suide.qinfeng.gov.cn/info/1046/2407.htm"
+    },
+    {
+      "start": "attraction-14",
+      "end": "person-xizhongxun",
+      "type": "RELATED_TO_PERSON",
+      "sourceUrl": "https://suide.qinfeng.gov.cn/info/1046/2407.htm"
+    },
+    {
+      "start": "attraction-15",
+      "end": "person-xizhongxun",
+      "type": "RELATED_TO_PERSON",
+      "sourceUrl": "https://www.mct.gov.cn/wlbphone/wlbydd/xxfb/qglb/sx_9787/202104/t20210426_923965.html"
+    },
+    {
+      "start": "attraction-15",
+      "end": "person-liuyuhou",
+      "type": "RELATED_TO_PERSON",
+      "sourceUrl": "https://www.mct.gov.cn/wlbphone/wlbydd/xxfb/qglb/sx_9787/202104/t20210426_923965.html"
+    },
+    {
+      "start": "attraction-16",
+      "end": "person-liuzhidan",
+      "type": "RELATED_TO_PERSON",
+      "sourceUrl": "https://www.qinfeng.gov.cn/info/4766/205366.htm"
+    },
+    {
+      "start": "attraction-6",
+      "end": "person-wangzhen",
+      "type": "RELATED_TO_PERSON",
+      "sourceUrl": "https://www.moe.gov.cn/jyb_xwfb/moe_2082/2021/2021_zl26/nnwjs/202304/t20230420_1056441.html"
+    },
+    {
+      "start": "person-wangzhen",
+      "end": "event-nanniwan-production",
+      "type": "PARTICIPATED_IN",
+      "sourceUrl": "https://www.moe.gov.cn/jyb_xwfb/moe_2082/2021/2021_zl26/nnwjs/202304/t20230420_1056441.html"
+    },
+    {
+      "start": "person-xizhongxun",
+      "end": "event-haojiaqiao",
+      "type": "PARTICIPATED_IN",
+      "sourceUrl": "https://www.mct.gov.cn/wlbphone/wlbydd/xxfb/qglb/sx_9787/202104/t20210426_923965.html"
     }
   ]
 }

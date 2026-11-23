@@ -13,7 +13,7 @@ class AttractionApiTest {
  @Autowired MockMvc mvc;
  @Test void listsRealAttractionsWithSourcesAndDifferentIllustrations() throws Exception {
    mvc.perform(get("/api/attractions").param("region", "延安"))
-      .andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(9))
+      .andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(11))
       .andExpect(jsonPath("$[0].name").value("杨家岭革命旧址"))
       .andExpect(jsonPath("$[0].sourceUrl").isNotEmpty())
       .andExpect(jsonPath("$[0].image").value("/images/yangjialing.png"))
