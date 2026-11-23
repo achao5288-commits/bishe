@@ -8,7 +8,10 @@
       "description": "中共中央机关曾驻于此，中共七大在这里召开。",
       "image": "/images/yangjialing.png",
       "sourceName": "中央纪委国家监委网站",
-      "sourceUrl": "https://www.ccdi.gov.cn/toutiao/202105/t20210503_241354.html"
+      "sourceUrl": "https://www.ccdi.gov.cn/toutiao/202105/t20210503_241354.html",
+      "aliases": [
+        "杨家岭"
+      ]
     },
     {
       "id": 2,
@@ -18,7 +21,10 @@
       "description": "1944年至1947年3月，中共中央书记处驻于枣园。",
       "image": "/images/zaoyuan.png",
       "sourceName": "陕西档案信息网",
-      "sourceUrl": "https://daj.shaanxi.gov.cn/Article/View?id=4757"
+      "sourceUrl": "https://daj.shaanxi.gov.cn/Article/View?id=4757",
+      "aliases": [
+        "枣园"
+      ]
     },
     {
       "id": 3,
@@ -28,7 +34,10 @@
       "description": "宝塔山是延安的标志性景观，也是延安革命纪念地景区的组成部分。",
       "image": "/images/baotashan.png",
       "sourceName": "文化和旅游部数据服务",
-      "sourceUrl": "https://sjfw.mct.gov.cn/site/dataservice/culdetails?curId=10&id=35098"
+      "sourceUrl": "https://sjfw.mct.gov.cn/site/dataservice/culdetails?curId=10&id=35098",
+      "aliases": [
+        "宝塔山"
+      ]
     },
     {
       "id": 4,
@@ -38,7 +47,10 @@
       "description": "纪念馆通过历史文物和资料，展示党中央在延安及陕甘宁边区领导革命的历程。",
       "image": "/images/memorial.png",
       "sourceName": "中央纪委国家监委网站",
-      "sourceUrl": "https://m.ccdi.gov.cn/content/dd/63/5314.html"
+      "sourceUrl": "https://m.ccdi.gov.cn/content/dd/63/5314.html",
+      "aliases": [
+        "延安革命纪念馆"
+      ]
     },
     {
       "id": 5,
@@ -48,7 +60,10 @@
       "description": "王家坪革命旧址是延安重要革命旧址，中央军委和八路军总部曾在这里工作。",
       "image": "/images/wangjiaping.png",
       "sourceName": "彰武县人民政府",
-      "sourceUrl": "https://www.zhangwu.gov.cn/content/2018/636742.html"
+      "sourceUrl": "https://www.zhangwu.gov.cn/content/2018/636742.html",
+      "aliases": [
+        "王家坪"
+      ]
     },
     {
       "id": 6,
@@ -58,7 +73,10 @@
       "description": "南泥湾革命旧址与延安时期的大生产运动有关，三五九旅曾在这里屯垦。",
       "image": "/images/nanniwan.png",
       "sourceName": "陕西档案信息网",
-      "sourceUrl": "https://daj.shaanxi.gov.cn/Article/View?id=4757"
+      "sourceUrl": "https://daj.shaanxi.gov.cn/Article/View?id=4757",
+      "aliases": [
+        "南泥湾"
+      ]
     },
     {
       "id": 7,
@@ -68,7 +86,10 @@
       "description": "位于米脂县杨家沟，转战陕北期间中共中央在此召开十二月会议。",
       "image": "/images/yangjiagou.png",
       "sourceName": "榆林政法网",
-      "sourceUrl": "https://www.ylzf.gov.cn/newsinfo/1576403.html"
+      "sourceUrl": "https://www.ylzf.gov.cn/newsinfo/1576403.html",
+      "aliases": [
+        "杨家沟"
+      ]
     },
     {
       "id": 8,
@@ -78,7 +99,67 @@
       "description": "位于靖边县小河村，1947年中共中央在此召开小河会议。",
       "image": "/images/xiaohe.png",
       "sourceName": "文化和旅游部",
-      "sourceUrl": "https://zhuanti.mct.gov.cn/history_detail/782.html"
+      "sourceUrl": "https://zhuanti.mct.gov.cn/history_detail/782.html",
+      "aliases": [
+        "小河会议"
+      ]
+    },
+    {
+      "id": 9,
+      "name": "凤凰山革命旧址",
+      "region": "延安",
+      "theme": "革命旧址",
+      "description": "凤凰山麓是中共中央进驻延安后的第一个驻地。",
+      "image": "/images/fenghuangshan.png",
+      "sourceName": "陕西档案信息网",
+      "sourceUrl": "https://daj.shaanxi.gov.cn/Article/View?id=4757",
+      "aliases": [
+        "凤凰山",
+        "凤凰山麓"
+      ]
+    },
+    {
+      "id": 10,
+      "name": "瓦窑堡会议旧址",
+      "region": "延安",
+      "theme": "革命旧址",
+      "description": "位于子长市，1935年中共中央在瓦窑堡召开政治局扩大会议。",
+      "image": "/images/wayaobao.png",
+      "sourceName": "中华人民共和国国防部",
+      "sourceUrl": "https://www.mod.gov.cn/gfbw/tp_214132/tsjs/4879356.html",
+      "aliases": [
+        "瓦窑堡会议",
+        "瓦窑堡"
+      ]
+    },
+    {
+      "id": 11,
+      "name": "吴起中央红军长征胜利纪念园",
+      "region": "延安",
+      "theme": "红色地标",
+      "description": "位于吴起县，纪念中央红军到达陕北及吴起镇战斗。",
+      "image": "/images/wuqi.png",
+      "sourceName": "延安纪检监察网",
+      "sourceUrl": "https://yanan.qinfeng.gov.cn/info/1217/25277.htm",
+      "aliases": [
+        "吴起纪念园",
+        "吴起镇",
+        "吴起长征",
+        "吴起"
+      ]
+    },
+    {
+      "id": 12,
+      "name": "神泉堡革命纪念馆",
+      "region": "榆林",
+      "theme": "纪念馆",
+      "description": "位于佳县神泉堡，保存中共中央转战陕北期间的驻地旧址。",
+      "image": "/images/shenquanbao.png",
+      "sourceName": "中共定边县纪委",
+      "sourceUrl": "https://dingbian.qinfeng.gov.cn/info/1084/4233.htm",
+      "aliases": [
+        "神泉堡"
+      ]
     }
   ],
   "events": [
@@ -121,6 +202,26 @@
       "id": "event-xiaohe",
       "name": "小河会议",
       "sourceUrl": "https://zhuanti.mct.gov.cn/history_detail/782.html"
+    },
+    {
+      "id": "event-fenghuangshan",
+      "name": "中共中央机关驻凤凰山麓",
+      "sourceUrl": "https://daj.shaanxi.gov.cn/Article/View?id=4757"
+    },
+    {
+      "id": "event-wayaobao",
+      "name": "瓦窑堡会议",
+      "sourceUrl": "https://www.mod.gov.cn/gfbw/tp_214132/tsjs/4879356.html"
+    },
+    {
+      "id": "event-wuqi",
+      "name": "中央红军抵达吴起镇",
+      "sourceUrl": "https://yanan.qinfeng.gov.cn/info/1217/25277.htm"
+    },
+    {
+      "id": "event-shenquanbao",
+      "name": "中共中央机关驻神泉堡",
+      "sourceUrl": "https://www.ylzf.gov.cn/newsinfo/1576403.html"
     }
   ],
   "links": [
@@ -163,6 +264,26 @@
       "attractionId": 8,
       "eventId": "event-xiaohe",
       "sourceUrl": "https://zhuanti.mct.gov.cn/history_detail/782.html"
+    },
+    {
+      "attractionId": 9,
+      "eventId": "event-fenghuangshan",
+      "sourceUrl": "https://daj.shaanxi.gov.cn/Article/View?id=4757"
+    },
+    {
+      "attractionId": 10,
+      "eventId": "event-wayaobao",
+      "sourceUrl": "https://www.mod.gov.cn/gfbw/tp_214132/tsjs/4879356.html"
+    },
+    {
+      "attractionId": 11,
+      "eventId": "event-wuqi",
+      "sourceUrl": "https://yanan.qinfeng.gov.cn/info/1217/25277.htm"
+    },
+    {
+      "attractionId": 12,
+      "eventId": "event-shenquanbao",
+      "sourceUrl": "https://www.ylzf.gov.cn/newsinfo/1576403.html"
     }
   ],
   "entities": [
@@ -207,6 +328,30 @@
       "name": "革命文化",
       "kind": "Theme",
       "sourceUrl": "https://lyfw.mct.gov.cn/site/special/details?id=1514"
+    },
+    {
+      "id": "person-zhangwentian",
+      "name": "张闻天",
+      "kind": "Person",
+      "sourceUrl": "https://www.mod.gov.cn/gfbw/tp_214132/tsjs/4879356.html"
+    },
+    {
+      "id": "work-protracted-war",
+      "name": "论持久战",
+      "kind": "Work",
+      "sourceUrl": "https://daj.shaanxi.gov.cn/Article/View?id=4757"
+    },
+    {
+      "id": "work-pla-declaration",
+      "name": "中国人民解放军宣言",
+      "kind": "Work",
+      "sourceUrl": "https://www.qinfeng.gov.cn/info/3632/151087.htm"
+    },
+    {
+      "id": "theme-longmarch",
+      "name": "长征",
+      "kind": "Theme",
+      "sourceUrl": "https://yanan.qinfeng.gov.cn/info/1217/25277.htm"
     }
   ],
   "relations": [
@@ -287,6 +432,48 @@
       "end": "theme-red-culture",
       "type": "BELONGS_TO_THEME",
       "sourceUrl": "https://lyfw.mct.gov.cn/site/special/details?id=1514"
+    },
+    {
+      "start": "attraction-9",
+      "end": "person-mao",
+      "type": "RELATED_TO_PERSON",
+      "sourceUrl": "https://daj.shaanxi.gov.cn/Article/View?id=4757"
+    },
+    {
+      "start": "attraction-10",
+      "end": "person-zhangwentian",
+      "type": "RELATED_TO_PERSON",
+      "sourceUrl": "https://www.mod.gov.cn/gfbw/tp_214132/tsjs/4879356.html"
+    },
+    {
+      "start": "attraction-11",
+      "end": "theme-longmarch",
+      "type": "BELONGS_TO_THEME",
+      "sourceUrl": "https://yanan.qinfeng.gov.cn/info/1217/25277.htm"
+    },
+    {
+      "start": "attraction-12",
+      "end": "person-mao",
+      "type": "RELATED_TO_PERSON",
+      "sourceUrl": "https://dingbian.qinfeng.gov.cn/info/1084/4233.htm"
+    },
+    {
+      "start": "person-zhangwentian",
+      "end": "event-wayaobao",
+      "type": "PARTICIPATED_IN",
+      "sourceUrl": "https://www.mod.gov.cn/gfbw/tp_214132/tsjs/4879356.html"
+    },
+    {
+      "start": "event-fenghuangshan",
+      "end": "work-protracted-war",
+      "type": "RELATED_TO_WORK",
+      "sourceUrl": "https://daj.shaanxi.gov.cn/Article/View?id=4757"
+    },
+    {
+      "start": "event-shenquanbao",
+      "end": "work-pla-declaration",
+      "type": "RELATED_TO_WORK",
+      "sourceUrl": "https://www.qinfeng.gov.cn/info/3632/151087.htm"
     }
   ]
 }

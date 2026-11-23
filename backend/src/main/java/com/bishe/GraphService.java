@@ -18,7 +18,7 @@ import java.io.IOException;
 
 @Service
 public class GraphService implements AutoCloseable {
-    public record Attraction(long id, String name, String region, String theme, String description, String image, String sourceName, String sourceUrl) {}
+    public record Attraction(long id, String name, String region, String theme, String description, String image, String sourceName, String sourceUrl, List<String> aliases) {}
     record Event(String id, String name, String sourceUrl) {}
     record Link(long attractionId, String eventId, String sourceUrl) {}
     record Entity(String id, String name, String kind, String sourceUrl) {}
@@ -49,8 +49,8 @@ public class GraphService implements AutoCloseable {
             });
             session.executeWrite(tx->{
                 for(Attraction a:seed.attractions()) {
-                    Map<String,Object> p=new HashMap<>(); p.put("id",a.id());p.put("name",a.name());p.put("region",a.region());p.put("theme",a.theme());p.put("description",a.description());p.put("image",a.image());p.put("sourceName",a.sourceName());p.put("sourceUrl",a.sourceUrl());
-                    tx.run("MERGE (a:Attraction {id:$id}) SET a.name=$name,a.region=$region,a.theme=$theme,a.description=$description,a.image=$image,a.sourceName=$sourceName,a.sourceUrl=$sourceUrl MERGE (r:Region {name:$region}) MERGE (a)-[rel:LOCATED_IN]->(r) SET rel.sourceUrl=$sourceUrl",p).consume();
+                    Map<String,Object> p=new HashMap<>(); p.put("id",a.id());p.put("name",a.name());p.put("region",a.region());p.put("theme",a.theme());p.put("description",a.description());p.put("image",a.image());p.put("sourceName",a.sourceName());p.put("sourceUrl",a.sourceUrl());p.put("aliases",a.aliases()==null?List.of():a.aliases());
+                    tx.run("MERGE (a:Attraction {id:$id}) SET a.name=$name,a.region=$region,a.theme=$theme,a.description=$description,a.image=$image,a.sourceName=$sourceName,a.sourceUrl=$sourceUrl,a.aliases=$aliases MERGE (r:Region {name:$region}) MERGE (a)-[rel:LOCATED_IN]->(r) SET rel.sourceUrl=$sourceUrl",p).consume();
                 }
                 for(Event e:seed.events()) tx.run("MERGE (e:Event {id:$id}) SET e.name=$name,e.sourceUrl=$sourceUrl",Map.of("id",e.id(),"name",e.name(),"sourceUrl",e.sourceUrl())).consume();
                 for(Link l:seed.links()) tx.run("MATCH (a:Attraction {id:$attractionId}),(e:Event {id:$eventId}) MERGE (a)-[r:RELATED_TO_EVENT]->(e) SET r.sourceUrl=$sourceUrl",Map.of("attractionId",l.attractionId(),"eventId",l.eventId(),"sourceUrl",l.sourceUrl())).consume();
@@ -69,7 +69,7 @@ public class GraphService implements AutoCloseable {
         }
     }
     public List<Attraction> attractions(String region) {
-        try(Session session=driver.session()){return session.executeRead(tx->tx.run("MATCH (a:Attraction) WHERE $region = '' OR a.region = $region RETURN a ORDER BY a.id",Map.of("region",region==null?"":region)).list(r->{var a=r.get("a");return new Attraction(a.get("id").asLong(),a.get("name").asString(),a.get("region").asString(),a.get("theme").asString(),a.get("description").asString(),a.get("image").asString(),a.get("sourceName").asString(),a.get("sourceUrl").asString());}));}
+        try(Session session=driver.session()){return session.executeRead(tx->tx.run("MATCH (a:Attraction) WHERE $region = '' OR a.region = $region RETURN a ORDER BY a.id",Map.of("region",region==null?"":region)).list(r->{var a=r.get("a");return new Attraction(a.get("id").asLong(),a.get("name").asString(),a.get("region").asString(),a.get("theme").asString(),a.get("description").asString(),a.get("image").asString(),a.get("sourceName").asString(),a.get("sourceUrl").asString(),a.get("aliases").isNull()?List.of():a.get("aliases").asList(v->v.asString()));}));}
     }
     public Map<Long,List<Match>> matchInterests(String region, List<String> interests) {
         if (interests.isEmpty()) return Map.of();

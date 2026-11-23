@@ -66,4 +66,12 @@ class ChatApiTest {
     .andExpect(status().isOk()).andExpect(jsonPath("$.attractions.length()").value(1))
     .andExpect(jsonPath("$.attractions[0].name").value("枣园革命旧址"));
  }
+ @Test void returnedCitationsOnlyUseRetrievedSourceNumbers() throws Exception {
+   when(llm.generate(anyString(),anyString())).thenReturn("可靠信息[1]，未经核实的引用[999]。");
+   mvc.perform(post("/api/chat").contentType(MediaType.APPLICATION_JSON).content("{\"question\":\"杨家岭的故事\"}"))
+    .andExpect(status().isOk()).andExpect(jsonPath("$.answer").value("可靠信息[1]，未经核实的引用（引用未核实）。"))
+    .andExpect(jsonPath("$.sources[0].id").value(1)).andExpect(jsonPath("$.citationWarning").value(true));
+   var prompt=org.mockito.ArgumentCaptor.forClass(String.class); verify(llm).generate(anyString(),prompt.capture());
+   org.junit.jupiter.api.Assertions.assertTrue(prompt.getValue().contains("来源编号[1]"));
+ }
 }
