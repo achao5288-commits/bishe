@@ -14,8 +14,10 @@ public class AttractionController {
     record Recommendation(long id, String name, String region, String theme, String reason, int score, List<GraphService.Match> graphMatches) {}
     record Request(String region, List<String> themes, @Size(max=10) List<@NotNull @Size(max=100) String> interestIds, @NotNull @Min(1) @Max(20) Integer limit) {}
     private final GraphService graph;
-    AttractionController(GraphService graph) { this.graph=graph; }
+    private final StoryService stories;
+    AttractionController(GraphService graph, StoryService stories) { this.graph=graph; this.stories=stories; }
     @GetMapping("/attractions") List<GraphService.Attraction> attractions(@RequestParam(required=false) String region) { return graph.attractions(region); }
+    @GetMapping("/attractions/{id}/story") StoryService.Story story(@PathVariable long id) { return stories.find(id); }
     @GetMapping("/graph") GraphService.Graph allGraph() { return graph.allGraph(); }
     @GetMapping("/graph/attractions/{id}") GraphService.Graph graph(@PathVariable long id) { return graph.graph(id); }
     @PostMapping("/recommendations") List<Recommendation> recommendations(@Valid @RequestBody Request request) {
