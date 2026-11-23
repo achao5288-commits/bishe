@@ -1,0 +1,15 @@
+{
+ "attractions": [
+  {"id":1,"name":"杨家岭革命旧址","region":"延安","theme":"革命旧址","description":"中共中央机关曾驻于此，中共七大在这里召开。","image":"/images/yangjialing.png","sourceName":"中央纪委国家监委网站","sourceUrl":"https://www.ccdi.gov.cn/toutiao/202105/t20210503_241354.html"},
+  {"id":2,"name":"枣园革命旧址","region":"延安","theme":"革命旧址","description":"1944年至1947年3月，中共中央书记处驻于枣园。","image":"/images/zaoyuan.png","sourceName":"陕西档案信息网","sourceUrl":"https://daj.shaanxi.gov.cn/Article/View?id=4757"},
+  {"id":3,"name":"宝塔山","region":"延安","theme":"红色地标","description":"宝塔山是延安的标志性景观，也是延安革命纪念地景区的组成部分。","image":"/images/baotashan.png","sourceName":"文化和旅游部数据服务","sourceUrl":"https://sjfw.mct.gov.cn/site/dataservice/culdetails?curId=10&id=35098"}
+ ],
+ "events": [
+  {"id":"event-7th-congress","name":"中国共产党第七次全国代表大会","sourceUrl":"https://www.ccdi.gov.cn/toutiao/202105/t20210503_241354.html"},
+  {"id":"event-secretariat","name":"中共中央书记处驻枣园","sourceUrl":"https://daj.shaanxi.gov.cn/Article/View?id=4757"}
+ ],
+ "links": [
+  {"attractionId":1,"eventId":"event-7th-congress","sourceUrl":"https://www.ccdi.gov.cn/toutiao/202105/t20210503_241354.html"},
+  {"attractionId":2,"eventId":"event-secretariat","sourceUrl":"https://daj.shaanxi.gov.cn/Article/View?id=4757"}
+ ]
+}
