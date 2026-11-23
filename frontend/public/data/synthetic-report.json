@@ -1,0 +1,960 @@
+{
+  "description": "模拟测试数据：偏好、浏览和评分均由开发者构造，不是真实用户反馈。未单独列出的景点评分按模拟规则设为3分。",
+  "method": "同一组模拟用户和候选景点；优化前按画像基础分排序，优化后加入去重与多样性重排。收藏和浏览景点不算作留出的正面目标。",
+  "ratingRule": "未单独设定的景点评为模拟3分；4–5分为正面，收藏和浏览景点不计入留出目标。",
+  "k": 3,
+  "users": 12,
+  "attractions": 16,
+  "simulatedRatings": 192,
+  "mean": {
+    "before": {
+      "precision": 0.1667,
+      "recall": 0.2778,
+      "ndcg": 0.1278,
+      "repeated": 0.5556,
+      "themeDiversity": 0.5556,
+      "regionDiversity": 0.5278,
+      "coverage": 0.8125
+    },
+    "after": {
+      "precision": 0.25,
+      "recall": 0.4028,
+      "ndcg": 0.2959,
+      "repeated": 0,
+      "themeDiversity": 0.8333,
+      "regionDiversity": 0.6667,
+      "coverage": 0.5625
+    }
+  },
+  "cases": [
+    {
+      "id": "U01",
+      "scenario": "会议历史爱好者",
+      "favorites": [
+        13
+      ],
+      "history": [
+        10
+      ],
+      "before": {
+        "precision": 0.3333333333333333,
+        "recall": 0.5,
+        "ndcg": 0.3065735963827292,
+        "repeated": 0.6666666666666666,
+        "themeDiversity": 0.6666666666666666,
+        "regionDiversity": 0.3333333333333333,
+        "top": [
+          {
+            "id": 13,
+            "name": "洛川会议纪念馆",
+            "theme": "纪念馆",
+            "region": "延安",
+            "rating": 5,
+            "seen": true
+          },
+          {
+            "id": 10,
+            "name": "瓦窑堡会议旧址",
+            "theme": "革命旧址",
+            "region": "延安",
+            "rating": 5,
+            "seen": true
+          },
+          {
+            "id": 1,
+            "name": "杨家岭革命旧址",
+            "theme": "革命旧址",
+            "region": "延安",
+            "rating": 4,
+            "seen": false
+          }
+        ]
+      },
+      "after": {
+        "precision": 0.3333333333333333,
+        "recall": 0.5,
+        "ndcg": 0.6131471927654584,
+        "repeated": 0,
+        "themeDiversity": 0.6666666666666666,
+        "regionDiversity": 0.6666666666666666,
+        "top": [
+          {
+            "id": 1,
+            "name": "杨家岭革命旧址",
+            "theme": "革命旧址",
+            "region": "延安",
+            "rating": 4,
+            "seen": false
+          },
+          {
+            "id": 12,
+            "name": "神泉堡革命纪念馆",
+            "theme": "纪念馆",
+            "region": "榆林",
+            "rating": 3,
+            "seen": false
+          },
+          {
+            "id": 7,
+            "name": "杨家沟革命旧址",
+            "theme": "革命旧址",
+            "region": "榆林",
+            "rating": 3,
+            "seen": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "U02",
+      "scenario": "陕北革命人物爱好者",
+      "favorites": [
+        16
+      ],
+      "history": [
+        11
+      ],
+      "before": {
+        "precision": 0,
+        "recall": 0,
+        "ndcg": 0,
+        "repeated": 0.6666666666666666,
+        "themeDiversity": 0.6666666666666666,
+        "regionDiversity": 0.3333333333333333,
+        "top": [
+          {
+            "id": 16,
+            "name": "刘志丹烈士陵园",
+            "theme": "红色地标",
+            "region": "延安",
+            "rating": 5,
+            "seen": true
+          },
+          {
+            "id": 11,
+            "name": "吴起中央红军长征胜利纪念园",
+            "theme": "红色地标",
+            "region": "延安",
+            "rating": 5,
+            "seen": true
+          },
+          {
+            "id": 1,
+            "name": "杨家岭革命旧址",
+            "theme": "革命旧址",
+            "region": "延安",
+            "rating": 3,
+            "seen": false
+          }
+        ]
+      },
+      "after": {
+        "precision": 0,
+        "recall": 0,
+        "ndcg": 0,
+        "repeated": 0,
+        "themeDiversity": 1,
+        "regionDiversity": 0.6666666666666666,
+        "top": [
+          {
+            "id": 1,
+            "name": "杨家岭革命旧址",
+            "theme": "革命旧址",
+            "region": "延安",
+            "rating": 3,
+            "seen": false
+          },
+          {
+            "id": 12,
+            "name": "神泉堡革命纪念馆",
+            "theme": "纪念馆",
+            "region": "榆林",
+            "rating": 3,
+            "seen": false
+          },
+          {
+            "id": 3,
+            "name": "宝塔山",
+            "theme": "红色地标",
+            "region": "延安",
+            "rating": 3,
+            "seen": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "U03",
+      "scenario": "边区农村生产爱好者",
+      "favorites": [
+        15
+      ],
+      "history": [],
+      "before": {
+        "precision": 0.3333333333333333,
+        "recall": 0.5,
+        "ndcg": 0.17376534287144002,
+        "repeated": 0.3333333333333333,
+        "themeDiversity": 0.6666666666666666,
+        "regionDiversity": 0.6666666666666666,
+        "top": [
+          {
+            "id": 15,
+            "name": "郝家桥红色革命教育基地",
+            "theme": "革命旧址",
+            "region": "榆林",
+            "rating": 5,
+            "seen": true
+          },
+          {
+            "id": 14,
+            "name": "绥德县革命历史纪念馆",
+            "theme": "纪念馆",
+            "region": "榆林",
+            "rating": 4,
+            "seen": false
+          },
+          {
+            "id": 1,
+            "name": "杨家岭革命旧址",
+            "theme": "革命旧址",
+            "region": "延安",
+            "rating": 3,
+            "seen": false
+          }
+        ]
+      },
+      "after": {
+        "precision": 0.3333333333333333,
+        "recall": 0.5,
+        "ndcg": 0.27541155237618664,
+        "repeated": 0,
+        "themeDiversity": 1,
+        "regionDiversity": 0.6666666666666666,
+        "top": [
+          {
+            "id": 14,
+            "name": "绥德县革命历史纪念馆",
+            "theme": "纪念馆",
+            "region": "榆林",
+            "rating": 4,
+            "seen": false
+          },
+          {
+            "id": 1,
+            "name": "杨家岭革命旧址",
+            "theme": "革命旧址",
+            "region": "延安",
+            "rating": 3,
+            "seen": false
+          },
+          {
+            "id": 3,
+            "name": "宝塔山",
+            "theme": "红色地标",
+            "region": "延安",
+            "rating": 3,
+            "seen": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "U04",
+      "scenario": "三五九旅历史爱好者",
+      "favorites": [
+        14
+      ],
+      "history": [
+        15
+      ],
+      "before": {
+        "precision": 0.3333333333333333,
+        "recall": 1,
+        "ndcg": 0.5,
+        "repeated": 0.6666666666666666,
+        "themeDiversity": 0.6666666666666666,
+        "regionDiversity": 0.6666666666666666,
+        "top": [
+          {
+            "id": 14,
+            "name": "绥德县革命历史纪念馆",
+            "theme": "纪念馆",
+            "region": "榆林",
+            "rating": 5,
+            "seen": true
+          },
+          {
+            "id": 15,
+            "name": "郝家桥红色革命教育基地",
+            "theme": "革命旧址",
+            "region": "榆林",
+            "rating": 4,
+            "seen": true
+          },
+          {
+            "id": 6,
+            "name": "南泥湾革命旧址",
+            "theme": "革命旧址",
+            "region": "延安",
+            "rating": 5,
+            "seen": false
+          }
+        ]
+      },
+      "after": {
+        "precision": 0.3333333333333333,
+        "recall": 1,
+        "ndcg": 1,
+        "repeated": 0,
+        "themeDiversity": 1,
+        "regionDiversity": 0.6666666666666666,
+        "top": [
+          {
+            "id": 6,
+            "name": "南泥湾革命旧址",
+            "theme": "革命旧址",
+            "region": "延安",
+            "rating": 5,
+            "seen": false
+          },
+          {
+            "id": 12,
+            "name": "神泉堡革命纪念馆",
+            "theme": "纪念馆",
+            "region": "榆林",
+            "rating": 3,
+            "seen": false
+          },
+          {
+            "id": 3,
+            "name": "宝塔山",
+            "theme": "红色地标",
+            "region": "延安",
+            "rating": 3,
+            "seen": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "U05",
+      "scenario": "延安时期文化爱好者",
+      "favorites": [
+        1
+      ],
+      "history": [
+        2
+      ],
+      "before": {
+        "precision": 0,
+        "recall": 0,
+        "ndcg": 0,
+        "repeated": 0.6666666666666666,
+        "themeDiversity": 0.3333333333333333,
+        "regionDiversity": 0.6666666666666666,
+        "top": [
+          {
+            "id": 1,
+            "name": "杨家岭革命旧址",
+            "theme": "革命旧址",
+            "region": "延安",
+            "rating": 5,
+            "seen": true
+          },
+          {
+            "id": 2,
+            "name": "枣园革命旧址",
+            "theme": "革命旧址",
+            "region": "延安",
+            "rating": 4,
+            "seen": true
+          },
+          {
+            "id": 7,
+            "name": "杨家沟革命旧址",
+            "theme": "革命旧址",
+            "region": "榆林",
+            "rating": 3,
+            "seen": false
+          }
+        ]
+      },
+      "after": {
+        "precision": 0.3333333333333333,
+        "recall": 0.5,
+        "ndcg": 0.17376534287144002,
+        "repeated": 0,
+        "themeDiversity": 0.6666666666666666,
+        "regionDiversity": 0.6666666666666666,
+        "top": [
+          {
+            "id": 7,
+            "name": "杨家沟革命旧址",
+            "theme": "革命旧址",
+            "region": "榆林",
+            "rating": 3,
+            "seen": false
+          },
+          {
+            "id": 13,
+            "name": "洛川会议纪念馆",
+            "theme": "纪念馆",
+            "region": "延安",
+            "rating": 4,
+            "seen": false
+          },
+          {
+            "id": 8,
+            "name": "小河会议旧址",
+            "theme": "革命旧址",
+            "region": "榆林",
+            "rating": 3,
+            "seen": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "U06",
+      "scenario": "转战陕北历史爱好者",
+      "favorites": [
+        7
+      ],
+      "history": [
+        8
+      ],
+      "before": {
+        "precision": 0,
+        "recall": 0,
+        "ndcg": 0,
+        "repeated": 0.6666666666666666,
+        "themeDiversity": 0.3333333333333333,
+        "regionDiversity": 0.6666666666666666,
+        "top": [
+          {
+            "id": 7,
+            "name": "杨家沟革命旧址",
+            "theme": "革命旧址",
+            "region": "榆林",
+            "rating": 5,
+            "seen": true
+          },
+          {
+            "id": 8,
+            "name": "小河会议旧址",
+            "theme": "革命旧址",
+            "region": "榆林",
+            "rating": 4,
+            "seen": true
+          },
+          {
+            "id": 1,
+            "name": "杨家岭革命旧址",
+            "theme": "革命旧址",
+            "region": "延安",
+            "rating": 3,
+            "seen": false
+          }
+        ]
+      },
+      "after": {
+        "precision": 0.6666666666666666,
+        "recall": 1,
+        "ndcg": 0.6590018048024133,
+        "repeated": 0,
+        "themeDiversity": 0.6666666666666666,
+        "regionDiversity": 0.6666666666666666,
+        "top": [
+          {
+            "id": 1,
+            "name": "杨家岭革命旧址",
+            "theme": "革命旧址",
+            "region": "延安",
+            "rating": 3,
+            "seen": false
+          },
+          {
+            "id": 12,
+            "name": "神泉堡革命纪念馆",
+            "theme": "纪念馆",
+            "region": "榆林",
+            "rating": 5,
+            "seen": false
+          },
+          {
+            "id": 9,
+            "name": "凤凰山革命旧址",
+            "theme": "革命旧址",
+            "region": "延安",
+            "rating": 4,
+            "seen": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "U07",
+      "scenario": "会议路线爱好者",
+      "favorites": [
+        8
+      ],
+      "history": [
+        7
+      ],
+      "before": {
+        "precision": 0,
+        "recall": 0,
+        "ndcg": 0,
+        "repeated": 0.6666666666666666,
+        "themeDiversity": 0.3333333333333333,
+        "regionDiversity": 0.6666666666666666,
+        "top": [
+          {
+            "id": 8,
+            "name": "小河会议旧址",
+            "theme": "革命旧址",
+            "region": "榆林",
+            "rating": 5,
+            "seen": true
+          },
+          {
+            "id": 7,
+            "name": "杨家沟革命旧址",
+            "theme": "革命旧址",
+            "region": "榆林",
+            "rating": 5,
+            "seen": true
+          },
+          {
+            "id": 1,
+            "name": "杨家岭革命旧址",
+            "theme": "革命旧址",
+            "region": "延安",
+            "rating": 3,
+            "seen": false
+          }
+        ]
+      },
+      "after": {
+        "precision": 0,
+        "recall": 0,
+        "ndcg": 0,
+        "repeated": 0,
+        "themeDiversity": 0.6666666666666666,
+        "regionDiversity": 0.6666666666666666,
+        "top": [
+          {
+            "id": 1,
+            "name": "杨家岭革命旧址",
+            "theme": "革命旧址",
+            "region": "延安",
+            "rating": 3,
+            "seen": false
+          },
+          {
+            "id": 12,
+            "name": "神泉堡革命纪念馆",
+            "theme": "纪念馆",
+            "region": "榆林",
+            "rating": 3,
+            "seen": false
+          },
+          {
+            "id": 9,
+            "name": "凤凰山革命旧址",
+            "theme": "革命旧址",
+            "region": "延安",
+            "rating": 3,
+            "seen": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "U08",
+      "scenario": "陕北革命旧址爱好者",
+      "favorites": [
+        9
+      ],
+      "history": [
+        1
+      ],
+      "before": {
+        "precision": 0,
+        "recall": 0,
+        "ndcg": 0,
+        "repeated": 0.6666666666666666,
+        "themeDiversity": 0.3333333333333333,
+        "regionDiversity": 0.6666666666666666,
+        "top": [
+          {
+            "id": 1,
+            "name": "杨家岭革命旧址",
+            "theme": "革命旧址",
+            "region": "延安",
+            "rating": 5,
+            "seen": true
+          },
+          {
+            "id": 9,
+            "name": "凤凰山革命旧址",
+            "theme": "革命旧址",
+            "region": "延安",
+            "rating": 5,
+            "seen": true
+          },
+          {
+            "id": 7,
+            "name": "杨家沟革命旧址",
+            "theme": "革命旧址",
+            "region": "榆林",
+            "rating": 3,
+            "seen": false
+          }
+        ]
+      },
+      "after": {
+        "precision": 0,
+        "recall": 0,
+        "ndcg": 0,
+        "repeated": 0,
+        "themeDiversity": 0.6666666666666666,
+        "regionDiversity": 0.6666666666666666,
+        "top": [
+          {
+            "id": 7,
+            "name": "杨家沟革命旧址",
+            "theme": "革命旧址",
+            "region": "榆林",
+            "rating": 3,
+            "seen": false
+          },
+          {
+            "id": 13,
+            "name": "洛川会议纪念馆",
+            "theme": "纪念馆",
+            "region": "延安",
+            "rating": 3,
+            "seen": false
+          },
+          {
+            "id": 8,
+            "name": "小河会议旧址",
+            "theme": "革命旧址",
+            "region": "榆林",
+            "rating": 3,
+            "seen": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "U09",
+      "scenario": "陕北抗战历史爱好者",
+      "favorites": [
+        13
+      ],
+      "history": [
+        6
+      ],
+      "before": {
+        "precision": 0.3333333333333333,
+        "recall": 0.5,
+        "ndcg": 0.13770577618809332,
+        "repeated": 0.6666666666666666,
+        "themeDiversity": 0.6666666666666666,
+        "regionDiversity": 0.3333333333333333,
+        "top": [
+          {
+            "id": 13,
+            "name": "洛川会议纪念馆",
+            "theme": "纪念馆",
+            "region": "延安",
+            "rating": 5,
+            "seen": true
+          },
+          {
+            "id": 6,
+            "name": "南泥湾革命旧址",
+            "theme": "革命旧址",
+            "region": "延安",
+            "rating": 4,
+            "seen": true
+          },
+          {
+            "id": 1,
+            "name": "杨家岭革命旧址",
+            "theme": "革命旧址",
+            "region": "延安",
+            "rating": 4,
+            "seen": false
+          }
+        ]
+      },
+      "after": {
+        "precision": 0.3333333333333333,
+        "recall": 0.5,
+        "ndcg": 0.27541155237618664,
+        "repeated": 0,
+        "themeDiversity": 0.6666666666666666,
+        "regionDiversity": 0.6666666666666666,
+        "top": [
+          {
+            "id": 1,
+            "name": "杨家岭革命旧址",
+            "theme": "革命旧址",
+            "region": "延安",
+            "rating": 4,
+            "seen": false
+          },
+          {
+            "id": 12,
+            "name": "神泉堡革命纪念馆",
+            "theme": "纪念馆",
+            "region": "榆林",
+            "rating": 3,
+            "seen": false
+          },
+          {
+            "id": 7,
+            "name": "杨家沟革命旧址",
+            "theme": "革命旧址",
+            "region": "榆林",
+            "rating": 3,
+            "seen": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "U10",
+      "scenario": "纪念场馆爱好者",
+      "favorites": [
+        4
+      ],
+      "history": [
+        14
+      ],
+      "before": {
+        "precision": 0,
+        "recall": 0,
+        "ndcg": 0,
+        "repeated": 0.3333333333333333,
+        "themeDiversity": 0.6666666666666666,
+        "regionDiversity": 0.6666666666666666,
+        "top": [
+          {
+            "id": 14,
+            "name": "绥德县革命历史纪念馆",
+            "theme": "纪念馆",
+            "region": "榆林",
+            "rating": 5,
+            "seen": true
+          },
+          {
+            "id": 6,
+            "name": "南泥湾革命旧址",
+            "theme": "革命旧址",
+            "region": "延安",
+            "rating": 3,
+            "seen": false
+          },
+          {
+            "id": 15,
+            "name": "郝家桥红色革命教育基地",
+            "theme": "革命旧址",
+            "region": "榆林",
+            "rating": 3,
+            "seen": false
+          }
+        ]
+      },
+      "after": {
+        "precision": 0,
+        "recall": 0,
+        "ndcg": 0,
+        "repeated": 0,
+        "themeDiversity": 1,
+        "regionDiversity": 0.6666666666666666,
+        "top": [
+          {
+            "id": 6,
+            "name": "南泥湾革命旧址",
+            "theme": "革命旧址",
+            "region": "延安",
+            "rating": 3,
+            "seen": false
+          },
+          {
+            "id": 12,
+            "name": "神泉堡革命纪念馆",
+            "theme": "纪念馆",
+            "region": "榆林",
+            "rating": 3,
+            "seen": false
+          },
+          {
+            "id": 3,
+            "name": "宝塔山",
+            "theme": "红色地标",
+            "region": "延安",
+            "rating": 3,
+            "seen": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "U11",
+      "scenario": "浏览后偏好会议旧址",
+      "favorites": [],
+      "history": [
+        13,
+        10
+      ],
+      "before": {
+        "precision": 0.3333333333333333,
+        "recall": 0.5,
+        "ndcg": 0.13770577618809332,
+        "repeated": 0.6666666666666666,
+        "themeDiversity": 0.6666666666666666,
+        "regionDiversity": 0.3333333333333333,
+        "top": [
+          {
+            "id": 10,
+            "name": "瓦窑堡会议旧址",
+            "theme": "革命旧址",
+            "region": "延安",
+            "rating": 4,
+            "seen": true
+          },
+          {
+            "id": 13,
+            "name": "洛川会议纪念馆",
+            "theme": "纪念馆",
+            "region": "延安",
+            "rating": 4,
+            "seen": true
+          },
+          {
+            "id": 1,
+            "name": "杨家岭革命旧址",
+            "theme": "革命旧址",
+            "region": "延安",
+            "rating": 4,
+            "seen": false
+          }
+        ]
+      },
+      "after": {
+        "precision": 0.3333333333333333,
+        "recall": 0.5,
+        "ndcg": 0.27541155237618664,
+        "repeated": 0,
+        "themeDiversity": 1,
+        "regionDiversity": 0.6666666666666666,
+        "top": [
+          {
+            "id": 1,
+            "name": "杨家岭革命旧址",
+            "theme": "革命旧址",
+            "region": "延安",
+            "rating": 4,
+            "seen": false
+          },
+          {
+            "id": 12,
+            "name": "神泉堡革命纪念馆",
+            "theme": "纪念馆",
+            "region": "榆林",
+            "rating": 3,
+            "seen": false
+          },
+          {
+            "id": 3,
+            "name": "宝塔山",
+            "theme": "红色地标",
+            "region": "延安",
+            "rating": 3,
+            "seen": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "U12",
+      "scenario": "新用户浏览红色地标",
+      "favorites": [],
+      "history": [],
+      "before": {
+        "precision": 0.3333333333333333,
+        "recall": 0.3333333333333333,
+        "ndcg": 0.2781491965442198,
+        "repeated": 0,
+        "themeDiversity": 0.6666666666666666,
+        "regionDiversity": 0.3333333333333333,
+        "top": [
+          {
+            "id": 1,
+            "name": "杨家岭革命旧址",
+            "theme": "革命旧址",
+            "region": "延安",
+            "rating": 3,
+            "seen": false
+          },
+          {
+            "id": 2,
+            "name": "枣园革命旧址",
+            "theme": "革命旧址",
+            "region": "延安",
+            "rating": 3,
+            "seen": false
+          },
+          {
+            "id": 3,
+            "name": "宝塔山",
+            "theme": "红色地标",
+            "region": "延安",
+            "rating": 5,
+            "seen": false
+          }
+        ]
+      },
+      "after": {
+        "precision": 0.3333333333333333,
+        "recall": 0.3333333333333333,
+        "ndcg": 0.2781491965442198,
+        "repeated": 0,
+        "themeDiversity": 1,
+        "regionDiversity": 0.6666666666666666,
+        "top": [
+          {
+            "id": 1,
+            "name": "杨家岭革命旧址",
+            "theme": "革命旧址",
+            "region": "延安",
+            "rating": 3,
+            "seen": false
+          },
+          {
+            "id": 12,
+            "name": "神泉堡革命纪念馆",
+            "theme": "纪念馆",
+            "region": "榆林",
+            "rating": 3,
+            "seen": false
+          },
+          {
+            "id": 3,
+            "name": "宝塔山",
+            "theme": "红色地标",
+            "region": "延安",
+            "rating": 5,
+            "seen": false
+          }
+        ]
+      }
+    }
+  ]
+}
