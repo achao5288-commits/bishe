@@ -6,6 +6,9 @@ import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
 import org.neo4j.driver.Session;
+import org.neo4j.driver.Record;
+import org.neo4j.driver.types.Node;
+import org.neo4j.driver.types.Relationship;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,54 +21,68 @@ public class GraphService implements AutoCloseable {
     public record Attraction(long id, String name, String region, String theme, String description, String image, String sourceName, String sourceUrl) {}
     record Event(String id, String name, String sourceUrl) {}
     record Link(long attractionId, String eventId, String sourceUrl) {}
-    record Seed(List<Attraction> attractions, List<Event> events, List<Link> links) {}
-    record Node(String id, String name, String label, String sourceUrl) {}
+    record Entity(String id, String name, String kind, String sourceUrl) {}
+    record Relation(String start, String end, String type, String sourceUrl) {}
+    record Seed(List<Attraction> attractions, List<Event> events, List<Link> links, List<Entity> entities, List<Relation> relations) {}
+    record GraphNode(String id, String name, String label, String sourceUrl) {}
     record Edge(String source, String target, String type, String sourceUrl) {}
-    record Graph(List<Node> nodes, List<Edge> edges) {}
+    record Graph(List<GraphNode> nodes, List<Edge> edges) {}
+    private static final Map<String,String> LABELS=Map.of("Person","人物","Event","历史事件","Work","著作","Theme","主题","Region","地区","Attraction","景点");
+    private static final Set<String> ENTITY_KINDS=Set.of("Person","Work","Theme");
+    private static final Set<String> RELATION_TYPES=Set.of("RELATED_TO_PERSON","PARTICIPATED_IN","RELATED_TO_WORK","BELONGS_TO_THEME");
     private final Driver driver;
     private final ObjectMapper mapper;
-    GraphService(@Value("${NEO4J_URI:bolt://localhost:7687}") String uri,
-                 @Value("${NEO4J_USER:neo4j}") String user,
-                 @Value("${NEO4J_PASSWORD:local-dev-password}") String password, ObjectMapper mapper) {
-        this.driver = GraphDatabase.driver(uri, AuthTokens.basic(user, password)); this.mapper = mapper;
+    GraphService(@Value("${NEO4J_URI:bolt://localhost:7687}") String uri, @Value("${NEO4J_USER:neo4j}") String user, @Value("${NEO4J_PASSWORD:local-dev-password}") String password, ObjectMapper mapper) {
+        this.driver=GraphDatabase.driver(uri,AuthTokens.basic(user,password)); this.mapper=mapper;
     }
     @PostConstruct void seed() throws IOException {
         Seed seed;
-        try (var input = getClass().getResourceAsStream("/graph-seed.json")) { seed = mapper.readValue(input, Seed.class); }
-        try (Session session = driver.session()) {
-            session.executeWrite(tx -> {
+        try(var input=getClass().getResourceAsStream("/graph-seed.json")){ seed=mapper.readValue(input,Seed.class); }
+        try(Session session=driver.session()) {
+            session.executeWrite(tx->{
                 tx.run("CREATE CONSTRAINT attraction_id IF NOT EXISTS FOR (a:Attraction) REQUIRE a.id IS UNIQUE").consume();
                 tx.run("CREATE CONSTRAINT event_id IF NOT EXISTS FOR (e:Event) REQUIRE e.id IS UNIQUE").consume();
                 tx.run("CREATE CONSTRAINT region_name IF NOT EXISTS FOR (r:Region) REQUIRE r.name IS UNIQUE").consume();
+                tx.run("CREATE CONSTRAINT knowledge_id IF NOT EXISTS FOR (k:Knowledge) REQUIRE k.id IS UNIQUE").consume();
                 return null;
             });
-            session.executeWrite(tx -> {
-                for (Attraction a : seed.attractions()) {
-                    Map<String,Object> p = new HashMap<>(); p.put("id",a.id()); p.put("name",a.name()); p.put("region",a.region()); p.put("theme",a.theme()); p.put("description",a.description()); p.put("image",a.image()); p.put("sourceName",a.sourceName()); p.put("sourceUrl",a.sourceUrl());
+            session.executeWrite(tx->{
+                for(Attraction a:seed.attractions()) {
+                    Map<String,Object> p=new HashMap<>(); p.put("id",a.id());p.put("name",a.name());p.put("region",a.region());p.put("theme",a.theme());p.put("description",a.description());p.put("image",a.image());p.put("sourceName",a.sourceName());p.put("sourceUrl",a.sourceUrl());
                     tx.run("MERGE (a:Attraction {id:$id}) SET a.name=$name,a.region=$region,a.theme=$theme,a.description=$description,a.image=$image,a.sourceName=$sourceName,a.sourceUrl=$sourceUrl MERGE (r:Region {name:$region}) MERGE (a)-[rel:LOCATED_IN]->(r) SET rel.sourceUrl=$sourceUrl",p).consume();
                 }
-                for (Event e : seed.events()) tx.run("MERGE (e:Event {id:$id}) SET e.name=$name,e.sourceUrl=$sourceUrl",Map.of("id",e.id(),"name",e.name(),"sourceUrl",e.sourceUrl())).consume();
-                for (Link l : seed.links()) tx.run("MATCH (a:Attraction {id:$attractionId}),(e:Event {id:$eventId}) MERGE (a)-[r:RELATED_TO_EVENT]->(e) SET r.sourceUrl=$sourceUrl",Map.of("attractionId",l.attractionId(),"eventId",l.eventId(),"sourceUrl",l.sourceUrl())).consume();
+                for(Event e:seed.events()) tx.run("MERGE (e:Event {id:$id}) SET e.name=$name,e.sourceUrl=$sourceUrl",Map.of("id",e.id(),"name",e.name(),"sourceUrl",e.sourceUrl())).consume();
+                for(Link l:seed.links()) tx.run("MATCH (a:Attraction {id:$attractionId}),(e:Event {id:$eventId}) MERGE (a)-[r:RELATED_TO_EVENT]->(e) SET r.sourceUrl=$sourceUrl",Map.of("attractionId",l.attractionId(),"eventId",l.eventId(),"sourceUrl",l.sourceUrl())).consume();
+                for(Entity e:seed.entities()) {
+                    if(!ENTITY_KINDS.contains(e.kind())) throw new IllegalArgumentException("Unsupported entity kind: "+e.kind());
+                    tx.run("MERGE (n:Knowledge {id:$id}) SET n:"+e.kind()+", n.name=$name,n.sourceUrl=$sourceUrl",Map.of("id",e.id(),"name",e.name(),"sourceUrl",e.sourceUrl())).consume();
+                }
+                for(Relation r:seed.relations()) {
+                    if(!RELATION_TYPES.contains(r.type())) throw new IllegalArgumentException("Unsupported relation: "+r.type());
+                    String cypher="MATCH (s),(t) WHERE (CASE WHEN s:Attraction THEN 'attraction-'+toString(s.id) ELSE s.id END)=$start AND (CASE WHEN t:Attraction THEN 'attraction-'+toString(t.id) ELSE t.id END)=$end MERGE (s)-[r:"+r.type()+"]->(t) SET r.sourceUrl=$sourceUrl RETURN count(r) AS count";
+                    long count=tx.run(cypher,Map.of("start",r.start(),"end",r.end(),"sourceUrl",r.sourceUrl())).single().get("count").asLong();
+                    if(count!=1) throw new IllegalStateException("Relation endpoints not unique or missing: "+r);
+                }
                 return null;
             });
         }
     }
     public List<Attraction> attractions(String region) {
-        try (Session session=driver.session()) { return session.executeRead(tx -> tx.run("MATCH (a:Attraction) WHERE $region = '' OR a.region = $region RETURN a ORDER BY a.id",Map.of("region",region == null ? "" : region)).list(r -> {
-            var a=r.get("a"); return new Attraction(a.get("id").asLong(),a.get("name").asString(),a.get("region").asString(),a.get("theme").asString(),a.get("description").asString(),a.get("image").asString(),a.get("sourceName").asString(),a.get("sourceUrl").asString());
-        })); }
+        try(Session session=driver.session()){return session.executeRead(tx->tx.run("MATCH (a:Attraction) WHERE $region = '' OR a.region = $region RETURN a ORDER BY a.id",Map.of("region",region==null?"":region)).list(r->{var a=r.get("a");return new Attraction(a.get("id").asLong(),a.get("name").asString(),a.get("region").asString(),a.get("theme").asString(),a.get("description").asString(),a.get("image").asString(),a.get("sourceName").asString(),a.get("sourceUrl").asString());}));}
     }
-    public Graph graph(long id) {
-        try (Session session=driver.session()) { return session.executeRead(tx -> {
-            var result=tx.run("MATCH (a:Attraction {id:$id}) OPTIONAL MATCH (a)-[r:LOCATED_IN|RELATED_TO_EVENT]->(n) RETURN a,r,n ORDER BY type(r), n.name",Map.of("id",id)).list();
-            if(result.isEmpty()) throw new ResponseStatusException(HttpStatus.NOT_FOUND,"景点不存在");
-            var a=result.get(0).get("a"); String aid="attraction-"+id;
-            List<Node> nodes=new ArrayList<>(); List<Edge> edges=new ArrayList<>();
-            nodes.add(new Node(aid,a.get("name").asString(),"景点",a.get("sourceUrl").asString()));
-            for(var row:result) { if(row.get("n").isNull()) continue; var n=row.get("n"); var rel=row.get("r").asRelationship(); boolean event=rel.type().equals("RELATED_TO_EVENT"); String nid=event ? n.get("id").asString() : "region-"+n.get("name").asString(); String source=rel.get("sourceUrl").asString(); nodes.add(new Node(nid,n.get("name").asString(),event?"历史事件":"地区",source)); edges.add(new Edge(aid,nid,rel.type(),source)); }
-            return new Graph(nodes,edges);
-        }); }
+    private String id(Node n){return n.hasLabel("Attraction")?"attraction-"+n.get("id").asLong():n.hasLabel("Region")?"region-"+n.get("name").asString():n.get("id").asString();}
+    private GraphNode node(Node n,String fallback){String label=LABELS.entrySet().stream().filter(e->n.hasLabel(e.getKey())).map(Map.Entry::getValue).findFirst().orElse("实体");return new GraphNode(id(n),n.get("name").asString(),label,n.get("sourceUrl").asString(fallback));}
+    private Graph assemble(List<Record> rows){
+        Map<String,GraphNode> nodes=new LinkedHashMap<>();Map<String,Edge> edges=new LinkedHashMap<>();
+        for(Record row:rows){Node s=row.get("s").asNode(),t=row.get("t").asNode();Relationship r=row.get("r").asRelationship();String source=r.get("sourceUrl").asString("");GraphNode from=node(s,source),to=node(t,source);nodes.putIfAbsent(from.id(),from);nodes.putIfAbsent(to.id(),to);Edge edge=new Edge(from.id(),to.id(),r.type(),source);edges.putIfAbsent(from.id()+"|"+r.type()+"|"+to.id(),edge);}
+        return new Graph(new ArrayList<>(nodes.values()),new ArrayList<>(edges.values()));
     }
-    @Override public void close() { driver.close(); }
+    public Graph graph(long id){
+        try(Session session=driver.session()){return session.executeRead(tx->{
+            if(tx.run("MATCH (a:Attraction {id:$id}) RETURN count(a) AS n",Map.of("id",id)).single().get("n").asLong()==0)throw new ResponseStatusException(HttpStatus.NOT_FOUND,"景点不存在");
+            return assemble(tx.run("MATCH p=(a:Attraction {id:$id})-[:LOCATED_IN|RELATED_TO_EVENT|RELATED_TO_PERSON|BELONGS_TO_THEME|PARTICIPATED_IN|RELATED_TO_WORK*1..2]->() UNWIND relationships(p) AS r RETURN DISTINCT startNode(r) AS s,endNode(r) AS t,r ORDER BY s.name,t.name",Map.of("id",id)).list());
+        });}
+    }
+    public Graph allGraph(){try(Session session=driver.session()){return session.executeRead(tx->assemble(tx.run("MATCH (s)-[r:LOCATED_IN|RELATED_TO_EVENT|RELATED_TO_PERSON|BELONGS_TO_THEME|PARTICIPATED_IN|RELATED_TO_WORK]->(t) RETURN s,t,r ORDER BY s.name,t.name LIMIT 500").list()));}}
+    @Override public void close(){driver.close();}
 }
-

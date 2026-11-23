@@ -59,6 +59,26 @@
       "image": "/images/nanniwan.png",
       "sourceName": "陕西档案信息网",
       "sourceUrl": "https://daj.shaanxi.gov.cn/Article/View?id=4757"
+    },
+    {
+      "id": 7,
+      "name": "杨家沟革命旧址",
+      "region": "榆林",
+      "theme": "革命旧址",
+      "description": "位于米脂县杨家沟，转战陕北期间中共中央在此召开十二月会议。",
+      "image": "/images/yangjiagou.png",
+      "sourceName": "榆林政法网",
+      "sourceUrl": "https://www.ylzf.gov.cn/newsinfo/1576403.html"
+    },
+    {
+      "id": 8,
+      "name": "小河会议旧址",
+      "region": "榆林",
+      "theme": "革命旧址",
+      "description": "位于靖边县小河村，1947年中共中央在此召开小河会议。",
+      "image": "/images/xiaohe.png",
+      "sourceName": "文化和旅游部",
+      "sourceUrl": "https://zhuanti.mct.gov.cn/history_detail/782.html"
     }
   ],
   "events": [
@@ -81,6 +101,26 @@
       "id": "event-nanniwan-production",
       "name": "南泥湾大生产运动",
       "sourceUrl": "https://daj.shaanxi.gov.cn/Article/View?id=4757"
+    },
+    {
+      "id": "event-yanan-literature",
+      "name": "延安文艺座谈会",
+      "sourceUrl": "https://www.forestry.gov.cn/lyj/1/dszl/20250502/623548.html"
+    },
+    {
+      "id": "event-zhang-memorial",
+      "name": "张思德追悼会",
+      "sourceUrl": "https://www.mod.gov.cn/gfbw/gfjy_index/16117605.html"
+    },
+    {
+      "id": "event-december",
+      "name": "十二月会议",
+      "sourceUrl": "https://www.ylzf.gov.cn/newsinfo/1576403.html"
+    },
+    {
+      "id": "event-xiaohe",
+      "name": "小河会议",
+      "sourceUrl": "https://zhuanti.mct.gov.cn/history_detail/782.html"
     }
   ],
   "links": [
@@ -103,6 +143,150 @@
       "attractionId": 6,
       "eventId": "event-nanniwan-production",
       "sourceUrl": "https://daj.shaanxi.gov.cn/Article/View?id=4757"
+    },
+    {
+      "attractionId": 1,
+      "eventId": "event-yanan-literature",
+      "sourceUrl": "https://www.forestry.gov.cn/lyj/1/dszl/20250502/623548.html"
+    },
+    {
+      "attractionId": 2,
+      "eventId": "event-zhang-memorial",
+      "sourceUrl": "https://www.mod.gov.cn/gfbw/gfjy_index/16117605.html"
+    },
+    {
+      "attractionId": 7,
+      "eventId": "event-december",
+      "sourceUrl": "https://www.ylzf.gov.cn/newsinfo/1576403.html"
+    },
+    {
+      "attractionId": 8,
+      "eventId": "event-xiaohe",
+      "sourceUrl": "https://zhuanti.mct.gov.cn/history_detail/782.html"
+    }
+  ],
+  "entities": [
+    {
+      "id": "person-mao",
+      "name": "毛泽东",
+      "kind": "Person",
+      "sourceUrl": "https://www.forestry.gov.cn/lyj/1/dszl/20250502/623548.html"
+    },
+    {
+      "id": "person-zhou",
+      "name": "周恩来",
+      "kind": "Person",
+      "sourceUrl": "https://www.ylzf.gov.cn/newsinfo/1576403.html"
+    },
+    {
+      "id": "person-zhang",
+      "name": "张思德",
+      "kind": "Person",
+      "sourceUrl": "https://www.mod.gov.cn/gfbw/gfjy_index/16117605.html"
+    },
+    {
+      "id": "work-literature",
+      "name": "在延安文艺座谈会上的讲话",
+      "kind": "Work",
+      "sourceUrl": "https://www.forestry.gov.cn/lyj/1/dszl/20250502/623548.html"
+    },
+    {
+      "id": "work-service",
+      "name": "为人民服务",
+      "kind": "Work",
+      "sourceUrl": "https://www.mod.gov.cn/gfbw/gfjy_index/16117605.html"
+    },
+    {
+      "id": "work-current",
+      "name": "目前形势和我们的任务",
+      "kind": "Work",
+      "sourceUrl": "https://www.jcgov.gov.cn/dtxx/jrtt/202606/t20260621_2362662.shtml"
+    },
+    {
+      "id": "theme-red-culture",
+      "name": "革命文化",
+      "kind": "Theme",
+      "sourceUrl": "https://lyfw.mct.gov.cn/site/special/details?id=1514"
+    }
+  ],
+  "relations": [
+    {
+      "start": "attraction-1",
+      "end": "person-mao",
+      "type": "RELATED_TO_PERSON",
+      "sourceUrl": "https://www.forestry.gov.cn/lyj/1/dszl/20250502/623548.html"
+    },
+    {
+      "start": "attraction-2",
+      "end": "person-zhang",
+      "type": "RELATED_TO_PERSON",
+      "sourceUrl": "https://www.mod.gov.cn/gfbw/gfjy_index/16117605.html"
+    },
+    {
+      "start": "attraction-7",
+      "end": "person-mao",
+      "type": "RELATED_TO_PERSON",
+      "sourceUrl": "https://www.ylzf.gov.cn/newsinfo/1576403.html"
+    },
+    {
+      "start": "attraction-7",
+      "end": "person-zhou",
+      "type": "RELATED_TO_PERSON",
+      "sourceUrl": "https://www.ylzf.gov.cn/newsinfo/1576403.html"
+    },
+    {
+      "start": "attraction-8",
+      "end": "person-mao",
+      "type": "RELATED_TO_PERSON",
+      "sourceUrl": "https://zhuanti.mct.gov.cn/history_detail/782.html"
+    },
+    {
+      "start": "person-mao",
+      "end": "event-yanan-literature",
+      "type": "PARTICIPATED_IN",
+      "sourceUrl": "https://www.forestry.gov.cn/lyj/1/dszl/20250502/623548.html"
+    },
+    {
+      "start": "person-mao",
+      "end": "event-zhang-memorial",
+      "type": "PARTICIPATED_IN",
+      "sourceUrl": "https://www.mod.gov.cn/gfbw/gfjy_index/16117605.html"
+    },
+    {
+      "start": "person-zhou",
+      "end": "event-december",
+      "type": "PARTICIPATED_IN",
+      "sourceUrl": "https://hdsswj.hd.gov.cn/keditor/attached/file/20160722/20160722175833_48031.pdf"
+    },
+    {
+      "start": "event-yanan-literature",
+      "end": "work-literature",
+      "type": "RELATED_TO_WORK",
+      "sourceUrl": "https://www.forestry.gov.cn/lyj/1/dszl/20250502/623548.html"
+    },
+    {
+      "start": "event-zhang-memorial",
+      "end": "work-service",
+      "type": "RELATED_TO_WORK",
+      "sourceUrl": "https://www.mod.gov.cn/gfbw/gfjy_index/16117605.html"
+    },
+    {
+      "start": "event-december",
+      "end": "work-current",
+      "type": "RELATED_TO_WORK",
+      "sourceUrl": "https://www.jcgov.gov.cn/dtxx/jrtt/202606/t20260621_2362662.shtml"
+    },
+    {
+      "start": "attraction-1",
+      "end": "theme-red-culture",
+      "type": "BELONGS_TO_THEME",
+      "sourceUrl": "https://lyfw.mct.gov.cn/site/special/details?id=1514"
+    },
+    {
+      "start": "attraction-2",
+      "end": "theme-red-culture",
+      "type": "BELONGS_TO_THEME",
+      "sourceUrl": "https://lyfw.mct.gov.cn/site/special/details?id=1514"
     }
   ]
 }
