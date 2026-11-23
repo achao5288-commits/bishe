@@ -15,7 +15,7 @@ test('published simulated data is complete and matches the report',()=>{
  const fs=require('node:fs'), path=require('node:path');
  const fixture=JSON.parse(fs.readFileSync(path.join(__dirname,'synthetic-users.json'),'utf8').replace(/^\uFEFF/,''));
  const ratings=JSON.parse(fs.readFileSync(path.join(__dirname,'synthetic-ratings.json'),'utf8'));
- const report=JSON.parse(fs.readFileSync(path.join(__dirname,'../../frontend/public/data/synthetic-report.json'),'utf8'));
+ const report=JSON.parse(fs.readFileSync(path.join(__dirname,'synthetic-report.json'),'utf8'));
  assert.equal(fixture.users.length,12); assert.equal(ratings.ratings.length,report.users*report.attractions);
  assert.equal(report.simulatedRatings,ratings.ratings.length);
  const keys=new Set(ratings.ratings.map(r=>`${r.userId}|${r.attractionId}`));
@@ -25,7 +25,7 @@ test('published simulated data is complete and matches the report',()=>{
 test('published comparison preserves the frozen previous baseline',()=>{
  const fs=require('node:fs'),path=require('node:path');
  const previous=JSON.parse(fs.readFileSync(path.join(__dirname,'coverage-baseline.json'),'utf8'));
- const report=JSON.parse(fs.readFileSync(path.join(__dirname,'../../frontend/public/data/synthetic-report.json'),'utf8'));
+ const report=JSON.parse(fs.readFileSync(path.join(__dirname,'synthetic-report.json'),'utf8'));
  assert.deepEqual(report.mean.previous,previous.mean);
  assert.deepEqual(report.cases.map(x=>x.id),previous.cases.map(x=>x.id));
  for(const row of report.cases) assert.deepEqual(row.previous,previous.cases.find(c=>c.id===row.id).result);
