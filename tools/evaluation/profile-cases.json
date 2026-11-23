@@ -1,0 +1,10 @@
+{
+ "description":"人工构造的用户历史和留出相关景点，仅作评估方法演示，不代表真实用户。相关性标签独立列出，画像仅由训练历史生成。",
+ "cases":[
+  {"id":"suide-to-nanniwan","favorites":[14],"history":[],"relevance":{"6":3}},
+  {"id":"haojiaqiao-to-suide","favorites":[15],"history":[],"relevance":{"14":3}},
+  {"id":"suide-from-view","favorites":[],"history":[15],"relevance":{"14":3}},
+  {"id":"yangjialing-to-fenghuangshan","favorites":[1],"history":[],"relevance":{"9":3}},
+  {"id":"fenghuangshan-to-yangjialing","favorites":[9],"history":[],"relevance":{"1":3}}
+ ]
+}

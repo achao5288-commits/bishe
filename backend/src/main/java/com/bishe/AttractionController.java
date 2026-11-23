@@ -1,5 +1,7 @@
 package com.bishe;
 import java.util.Comparator;
+import java.util.ArrayList;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Map;
 import jakarta.validation.Valid;
@@ -11,8 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController @RequestMapping("/api")
 public class AttractionController {
-    record Recommendation(long id, String name, String region, String theme, String reason, int score, List<GraphService.Match> graphMatches) {}
-    record Request(String region, List<String> themes, @Size(max=10) List<@NotNull @Size(max=100) String> interestIds, @NotNull @Min(1) @Max(20) Integer limit) {}
+    record Recommendation(long id, String name, String region, String theme, String reason, int score, List<GraphService.Match> graphMatches, int profileScore, List<GraphService.Match> profileMatches) {}
+    record Request(String region, List<String> themes, @Size(max=10) List<@NotNull @Size(max=100) String> interestIds, @Size(max=10) Map<@NotBlank @Size(max=100) String,@NotNull @Min(1) @Max(3) Integer> profileInterests, @NotNull @Min(1) @Max(20) Integer limit) {}
     private final GraphService graph;
     private final StoryService stories;
     AttractionController(GraphService graph, StoryService stories) { this.graph=graph; this.stories=stories; }
@@ -23,12 +25,18 @@ public class AttractionController {
     @PostMapping("/recommendations") List<Recommendation> recommendations(@Valid @RequestBody Request request) {
         List<String> themes=request.themes()==null?List.of():request.themes();
         List<String> interests=request.interestIds()==null?List.of():request.interestIds().stream().distinct().toList();
-        Map<Long,List<GraphService.Match>> matches=graph.matchInterests(request.region(),interests);
+        Map<String,Integer> profile=request.profileInterests()==null?Map.of():request.profileInterests();
+        List<String> allInterests=new ArrayList<>(interests);
+        profile.keySet().stream().filter(id->!interests.contains(id)).sorted().forEach(allInterests::add);
+        Map<Long,List<GraphService.Match>> matches=graph.matchInterests(request.region(),allInterests);
         return graph.attractions(request.region()).stream().map(a->{
-            List<GraphService.Match> evidence=matches.getOrDefault(a.id(),List.of());
-            int score=(themes.contains(a.theme())?20:0)+evidence.stream().mapToInt(GraphService.Match::points).sum();
-            String reason=!evidence.isEmpty()?"关联您感兴趣的「"+evidence.stream().map(GraphService.Match::name).collect(java.util.stream.Collectors.joining("、"))+"」，可查看下方路径和来源。":themes.contains(a.theme())?"符合您选择的主题："+a.theme():"可作为浏览参考。";
-            return new Recommendation(a.id(),a.name(),a.region(),a.theme(),reason,score,evidence);
+            List<GraphService.Match> found=matches.getOrDefault(a.id(),List.of());
+            List<GraphService.Match> evidence=found.stream().filter(m->interests.contains(m.id())).toList();
+            List<GraphService.Match> profileMatches=found.stream().filter(m->!interests.contains(m.id()) && profile.containsKey(m.id())).toList();
+            int profileScore=profileMatches.stream().mapToInt(m->m.points()*profile.get(m.id())/10).sum();
+            int score=(themes.contains(a.theme())?20:0)+evidence.stream().mapToInt(GraphService.Match::points).sum()+profileScore;
+            String reason=!evidence.isEmpty()?"关联您感兴趣的「"+evidence.stream().map(GraphService.Match::name).collect(java.util.stream.Collectors.joining("、"))+"」，可查看下方路径和来源。":!profileMatches.isEmpty()?"根据您收藏或浏览过的景点，发现与「"+profileMatches.stream().map(GraphService.Match::name).collect(java.util.stream.Collectors.joining("、"))+"」有关的内容。":themes.contains(a.theme())?"符合您选择的主题："+a.theme():"可作为浏览参考。";
+            return new Recommendation(a.id(),a.name(),a.region(),a.theme(),reason,score,evidence,profileScore,profileMatches);
         }).sorted(Comparator.comparingInt(Recommendation::score).reversed().thenComparingLong(Recommendation::id)).limit(request.limit()).toList();
     }
 }
