@@ -183,6 +183,10 @@ python -m unittest discover -s tools/crawler/tests -v
 
 换到已安装 Docker 的电脑后，复制 `.env.example` 为 `.env` 并设置密码，在项目根目录运行 `docker compose up -d --build`，访问 http://127.0.0.1:8080。Redis 默认关闭，可按需启用。完整步骤见 [Docker Compose 部署指南](docs/Docker-Compose部署指南.md)。容器构建和实际联通仍需在目标电脑验证。
 
+## 持续集成
+
+推送到 `main`、创建或更新 Pull Request 时，[GitHub Actions](../../actions) 会运行后端测试、Redis 联通测试、前端构建和工具测试，并在独立临时环境中构建 Compose 服务，检查前端代理、图谱、推荐及注册收藏链路。工作流使用临时测试账号与数据库，不需要配置真实 DeepSeek 密钥，也不会部署或发布项目。详细说明见 [持续集成指南](docs/持续集成指南.md)。
+
 ## 本地开发启动
 
 需要 Java 21、Maven 3.9+、Node.js 22.13+、MySQL 8.4 和 Neo4j 5.26，可选 Redis 7.4。先准备 MySQL 数据库 `red_tourism` 及专用账户 `red_tourism`，设置 `BISHE_MYSQL_PASSWORD`；也可以通过 `MYSQL_URL`、`MYSQL_USER` 自定义连接。通过 `NEO4J_URI`、`NEO4J_USER`、`NEO4J_PASSWORD` 配置图数据库连接，并确保账号有创建约束及写入权限。应用启动时初始化图谱。需要通过 Compose 只启动开发数据库时，请参阅部署指南；默认 Compose 不向宿主机公开数据库端口。

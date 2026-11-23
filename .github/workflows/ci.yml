@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      neo4j:
+        image: neo4j:5.26.0-community
+        env:
+          NEO4J_AUTH: neo4j/ci-test-neo4j-password
+        ports:
+          - 7687:7687
+        options: >-
+          --health-cmd "cypher-shell -u neo4j -p ci-test-neo4j-password 'RETURN 1'"
+          --health-interval 10s --health-timeout 8s --health-retries 18
+      redis:
+        image: redis:7.4-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: backend/pom.xml
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+      - name: Backend tests, including real Redis
+        working-directory: backend
+        env:
+          NEO4J_PASSWORD: ci-test-neo4j-password
+          REDIS_INTEGRATION: 'true'
+        run: mvn --batch-mode --no-transfer-progress verify
+      - name: JavaScript tests
+        run: node --test tools/ci/smoke.test.mjs tools/evaluation/*.test.cjs
+      - name: Crawler tests
+        env:
+          PYTHONPATH: tools/crawler
+        run: python3 -m unittest discover -s tools/crawler/tests
+      - name: Build frontend
+        working-directory: frontend
+        run: |
+          corepack enable
+          corepack prepare pnpm@11.25.0 --activate
+          pnpm install --frozen-lockfile
+          pnpm run build
+
+  compose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      BISHE_MYSQL_ROOT_PASSWORD: ci-root-password-only
+      BISHE_MYSQL_PASSWORD: ci-app-password-only
+      NEO4J_PASSWORD: ci-neo4j-password-only
+      APP_JWT_SECRET: ci-only-jwt-secret-at-least-32-bytes
+      REDIS_CACHE_ENABLED: 'true'
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+      - name: Validate Compose configuration
+        run: docker compose --profile cache config --quiet
+      - name: Build and wait for services
+        run: docker compose --profile cache up -d --build --wait --wait-timeout 300
+      - name: Verify proxy, graph, recommendations, MySQL and login
+        run: node tools/ci/smoke.mjs
+      - name: Show service status on failure
+        if: failure()
+        run: |
+          docker compose --profile cache ps
+          docker compose --profile cache logs --tail=100
+      - name: Stop test stack
+        if: always()
+        run: docker compose --profile cache down --volumes
