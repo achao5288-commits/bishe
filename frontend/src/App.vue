@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, nextTick, defineAsyncComponent, watch } from 'vue'
 const GraphView = defineAsyncComponent(() => import('./GraphView.vue'))
+const ChatPanel = defineAsyncComponent(() => import('./ChatPanel.vue'))
 const attractions = ref([]), recommendations = ref([]), region = ref('延安'), theme = ref('革命旧址'), error = ref(''), loading = ref(false), searched = ref(false), graph = ref(null), graphError = ref(''), graphLoading = ref(false), graphTitle = ref(''), interestId = ref(''), interestNodes = ref([]), interestsError = ref(false), story = ref(null), storyLoading = ref(false), storyError = ref('')
 let recommendationVersion = 0
 function clearRecommendations() { recommendationVersion++; recommendations.value = []; searched.value = false; loading.value = false }
@@ -41,7 +42,7 @@ function chooseInterest(id) { interestId.value = id; document.getElementById('re
 onMounted(() => { load(); loadInterests() })
 </script>
 <template>
-  <header class="site-header"><div class="container nav"><a class="brand" href="#top" aria-label="陕北红色文旅首页"><span class="brand-mark">陕</span><span><strong>陕北红色文旅</strong><small>SHANBEI · MEMORY</small></span></a><nav aria-label="页面导航"><a href="#discover">发现陕北</a><a href="#recommend">个性推荐</a><span class="nav-note">毕业设计 · 演示版</span></nav></div></header>
+  <header class="site-header"><div class="container nav"><a class="brand" href="#top" aria-label="陕北红色文旅首页"><span class="brand-mark">陕</span><span><strong>陕北红色文旅</strong><small>SHANBEI · MEMORY</small></span></a><nav aria-label="页面导航"><a href="#discover">发现陕北</a><a href="#recommend">个性推荐</a><a href="#ask">智能问答</a><span class="nav-note">毕业设计 · 演示版</span></nav></div></header>
   <main id="top">
     <section class="hero"><div class="hero-shade"></div><div class="container hero-content"><div class="hero-kicker"><span></span> 红色记忆 · 山河之间</div><h1>循着历史的足迹<br><em>遇见陕北</em></h1><p>黄土为卷，岁月为墨。<br>从一处处红色印记出发，读懂这片土地的故事。</p><a class="hero-link" href="#recommend">开启探索 <span>↗</span></a><div class="hero-caption">陕北风貌主题插画 · 非真实景点照片</div></div><div class="hero-side">LAND OF MEMORY <span> / </span> NORTHERN SHAANXI</div></section>
     <div class="intro-strip"><div class="container intro-inner"><p><span class="strip-dot"></span> 每一次出发，都是一次与历史的相遇</p><span>探索 · 发现 · 记忆</span></div></div>
@@ -59,6 +60,7 @@ onMounted(() => { load(); loadInterests() })
         <p v-if="graphLoading" class="empty" role="status">正在加载知识关联…</p><p v-if="graphError" class="error" role="alert">{{ graphError }}</p>
         <div v-if="graph" id="graph-results" class="graph-panel" aria-live="polite"><div class="graph-heading"><div><p class="overline">KNOWLEDGE GRAPH</p><h3>{{ graphTitle }}</h3></div><button class="graph-close" @click="graph = null" aria-label="关闭知识关联">×</button></div><GraphView :graph="graph" :relation-names="relationNames" @choose-interest="chooseInterest" /></div>
       </section>
+      <ChatPanel />
       <section class="closing"><span class="closing-mark">“</span><div><p>山河为证，记忆常新。</p><span>让每一段旅程，都有可以追寻的故事。</span></div><span class="closing-en">A JOURNEY THROUGH<br>HISTORY & MEMORY</span></section>
     </div>
   </main>
