@@ -39,7 +39,13 @@ public class ChatService {
         LinkedHashMap<String,GraphService.Edge> edges=new LinkedHashMap<>();
         StringBuilder evidence=new StringBuilder();
         for(var a:picked.values()){
-            var story=stories.find(a.id()); evidence.append("\n景点：").append(a.name()).append("\n");
+            StoryService.Story story;
+            try { story=stories.find(a.id()); }
+            catch (org.springframework.web.server.ResponseStatusException e) {
+                if (e.getStatusCode().value()==404) return insufficient("该景点暂未整理历史故事，无法提供有来源的回答。",places);
+                throw e;
+            }
+            evidence.append("\n景点：").append(a.name()).append("\n");
             for(var section:story.sections()){
                 evidence.append("【").append(section.title()).append("】").append(section.content()).append(" 来源编号");
                 for(var source:section.sources()) evidence.append("[").append(addReference(references,source.name(),source.url())).append("]");

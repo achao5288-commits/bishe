@@ -1,31 +1,26 @@
 package com.bishe;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 public class StoryService {
     public record Source(String name, String url) {}
     public record Section(String title, String content, List<Source> sources) {}
     public record Story(long attractionId, String title, List<Section> sections) {}
-    private final Map<Long,Story> stories;
-    StoryService(ObjectMapper mapper) throws IOException {
-        try (var input=StoryService.class.getResourceAsStream("/attraction-stories.json")) {
-            List<Story> items=mapper.readValue(input,new TypeReference<List<Story>>(){});
-            stories=Map.copyOf(items.stream().collect(Collectors.toMap(Story::attractionId,Function.identity())));
-        }
-    }
+    private final GraphService graph;
+    private final ObjectMapper mapper;
+    StoryService(GraphService graph, ObjectMapper mapper) { this.graph=graph; this.mapper=mapper; }
     public Story find(long id) {
-        Story story=stories.get(id);
-        if(story==null) throw new ResponseStatusException(HttpStatus.NOT_FOUND,"暂无该景点的故事");
-        return story;
+        try (var session=graph.driver().session()) {
+            String json=session.executeRead(tx -> tx.run("MATCH (a:Attraction {id:$id}) WHERE a.storyJson IS NOT NULL RETURN a.storyJson AS story",Map.of("id",id)).list(r->r.get("story").asString()).stream().findFirst().orElse(null));
+            if(json==null) throw new ResponseStatusException(HttpStatus.NOT_FOUND,"暂无该景点的故事");
+            try { return mapper.readValue(json,Story.class); }
+            catch (java.io.IOException e) { throw new IllegalStateException("故事资料格式错误",e); }
+        }
     }
 }

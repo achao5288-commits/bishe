@@ -43,6 +43,8 @@ public class GraphService implements AutoCloseable {
     }
     @PostConstruct void seed() throws IOException {
         Seed seed;
+        List<StoryService.Story> seedStories;
+        try(var input=getClass().getResourceAsStream("/attraction-stories.json")){ seedStories=mapper.readValue(input,new TypeReference<List<StoryService.Story>>(){}); }
         try(var input=getClass().getResourceAsStream("/graph-seed.json")){ seed=mapper.readValue(input,Seed.class); }
         try(Session session=driver.session()) {
             session.executeWrite(tx->{
@@ -53,26 +55,33 @@ public class GraphService implements AutoCloseable {
                 return null;
             });
             session.executeWrite(tx->{
+                if(tx.run("MATCH (s:SeedControl {key:$key}) RETURN count(s) AS n",Map.of("key","initial-content-v1")).single().get("n").asLong()>0) return null;
                 for(Attraction a:seed.attractions()) {
                     Map<String,Object> p=new HashMap<>(); p.put("id",a.id());p.put("name",a.name());p.put("region",a.region());p.put("theme",a.theme());p.put("description",a.description());p.put("image",a.image());p.put("sourceName",a.sourceName());p.put("sourceUrl",a.sourceUrl());p.put("aliases",a.aliases()==null?List.of():a.aliases());
-                    tx.run("MERGE (a:Attraction {id:$id}) SET a.name=$name,a.region=$region,a.theme=$theme,a.description=$description,a.image=$image,a.sourceName=$sourceName,a.sourceUrl=$sourceUrl,a.aliases=$aliases MERGE (r:Region {name:$region}) MERGE (a)-[rel:LOCATED_IN]->(r) SET rel.sourceUrl=$sourceUrl",p).consume();
+                    tx.run("MERGE (a:Attraction {id:$id}) ON CREATE SET a.name=$name,a.region=$region,a.theme=$theme,a.description=$description,a.image=$image,a.sourceName=$sourceName,a.sourceUrl=$sourceUrl,a.aliases=$aliases MERGE (r:Region {name:$region}) MERGE (a)-[rel:LOCATED_IN]->(r) ON CREATE SET rel.sourceUrl=$sourceUrl",p).consume();
                 }
-                for(Event e:seed.events()) tx.run("MERGE (e:Event {id:$id}) SET e.name=$name,e.sourceUrl=$sourceUrl",Map.of("id",e.id(),"name",e.name(),"sourceUrl",e.sourceUrl())).consume();
-                for(Link l:seed.links()) tx.run("MATCH (a:Attraction {id:$attractionId}),(e:Event {id:$eventId}) MERGE (a)-[r:RELATED_TO_EVENT]->(e) SET r.sourceUrl=$sourceUrl",Map.of("attractionId",l.attractionId(),"eventId",l.eventId(),"sourceUrl",l.sourceUrl())).consume();
+                for(Event e:seed.events()) tx.run("MERGE (e:Event {id:$id}) ON CREATE SET e.name=$name,e.sourceUrl=$sourceUrl",Map.of("id",e.id(),"name",e.name(),"sourceUrl",e.sourceUrl())).consume();
+                for(Link l:seed.links()) tx.run("MATCH (a:Attraction {id:$attractionId}),(e:Event {id:$eventId}) MERGE (a)-[r:RELATED_TO_EVENT]->(e) ON CREATE SET r.sourceUrl=$sourceUrl",Map.of("attractionId",l.attractionId(),"eventId",l.eventId(),"sourceUrl",l.sourceUrl())).consume();
                 for(Entity e:seed.entities()) {
                     if(!ENTITY_KINDS.contains(e.kind())) throw new IllegalArgumentException("Unsupported entity kind: "+e.kind());
-                    tx.run("MERGE (n:Knowledge {id:$id}) SET n:"+e.kind()+", n.name=$name,n.sourceUrl=$sourceUrl",Map.of("id",e.id(),"name",e.name(),"sourceUrl",e.sourceUrl())).consume();
+                    tx.run("MERGE (n:Knowledge {id:$id}) ON CREATE SET n:"+e.kind()+", n.name=$name,n.sourceUrl=$sourceUrl",Map.of("id",e.id(),"name",e.name(),"sourceUrl",e.sourceUrl())).consume();
                 }
                 for(Relation r:seed.relations()) {
                     if(!RELATION_TYPES.contains(r.type())) throw new IllegalArgumentException("Unsupported relation: "+r.type());
-                    String cypher="MATCH (s),(t) WHERE (CASE WHEN s:Attraction THEN 'attraction-'+toString(s.id) ELSE s.id END)=$start AND (CASE WHEN t:Attraction THEN 'attraction-'+toString(t.id) ELSE t.id END)=$end MERGE (s)-[r:"+r.type()+"]->(t) SET r.sourceUrl=$sourceUrl RETURN count(r) AS count";
+                    String cypher="MATCH (s),(t) WHERE (CASE WHEN s:Attraction THEN 'attraction-'+toString(s.id) ELSE s.id END)=$start AND (CASE WHEN t:Attraction THEN 'attraction-'+toString(t.id) ELSE t.id END)=$end MERGE (s)-[r:"+r.type()+"]->(t) ON CREATE SET r.sourceUrl=$sourceUrl RETURN count(r) AS count";
                     long count=tx.run(cypher,Map.of("start",r.start(),"end",r.end(),"sourceUrl",r.sourceUrl())).single().get("count").asLong();
                     if(count!=1) throw new IllegalStateException("Relation endpoints not unique or missing: "+r);
                 }
+                for(StoryService.Story story:seedStories) {
+                    try { tx.run("MATCH (a:Attraction {id:$id}) WHERE a.storyJson IS NULL SET a.storyJson=$story",Map.of("id",story.attractionId(),"story",mapper.writeValueAsString(story))).consume(); }
+                    catch (com.fasterxml.jackson.core.JsonProcessingException e) { throw new IllegalStateException(e); }
+                }
+                tx.run("CREATE (:SeedControl {key:$key})",Map.of("key","initial-content-v1")).consume();
                 return null;
             });
         }
     }
+    Driver driver(){return driver;}
     public List<Attraction> attractions(String region) {
         return cache.get("attractions",region==null?"":region,new TypeReference<List<Attraction>>() {},cache.attractionTtl(),()->loadAttractions(region));
     }
