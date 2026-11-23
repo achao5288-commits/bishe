@@ -11,3 +11,9 @@ test('perfect ranking and no relevant items are handled', () => {
  assert.equal(metrics([{id:1},{id:2}], {'1':3,'2':1}).ndcg,1);
  assert.deepEqual(metrics([{id:1}], {}), {precision:0,recall:0,ndcg:0});
 });
+
+test('within-list diversity counts distinct categories', () => {
+ const {withinListDiversity}=require('./evaluate.cjs');
+ assert.equal(withinListDiversity([{theme:'A'},{theme:'A'},{theme:'B'}],'theme'),2/3);
+ assert.equal(withinListDiversity([],'theme'),0);
+});

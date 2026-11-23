@@ -22,7 +22,7 @@ async function run() {
     if (available.length > 20) throw new Error(`case ${c.id}: more than 20 candidates; evaluation requires pagination`);
     const response = await fetch(`${base}/api/recommendations`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({region:c.region, themes:c.themes, interestIds:c.interestIds, limit:20}) });
     if (!response.ok) throw new Error(`case ${c.id}: HTTP ${response.status}`);
-    const current = await response.json();
+    const current = (await response.json()).sort((a,b) => b.score-a.score || a.id-b.id);
     if (current.length !== available.length) throw new Error(`case ${c.id}: incomplete candidate list`);
     const baseline = [...current].sort((a,b) => {
       const score = x => (c.themes.includes(x.theme) ? 20 : 0) + x.graphMatches.reduce((sum,m) => sum + (m.distance === 1 ? 60 : 30),0);
@@ -34,5 +34,9 @@ async function run() {
   console.log(JSON.stringify({description,k,cases:rows,mean:{baseline:mean('baseline'),weighted:mean('weighted')}},null,2));
 }
 if (require.main === module) run().catch(error => { console.error(error.message); process.exitCode=1; });
-module.exports = { metrics };
+function withinListDiversity(items, key, k=3) {
+  const top=items.slice(0,k);
+  return top.length ? new Set(top.map(item=>item[key])).size/top.length : 0;
+}
+module.exports = { metrics, withinListDiversity };
 
