@@ -10,3 +10,6 @@ frontend/dist/
 
 __pycache__/
 *.pyc
+
+/data/
+/backend/data/
