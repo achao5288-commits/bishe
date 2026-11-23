@@ -27,6 +27,7 @@ public class GraphService implements AutoCloseable {
     record GraphNode(String id, String name, String label, String sourceUrl) {}
     record Edge(String source, String target, String type, String sourceUrl) {}
     record Graph(List<GraphNode> nodes, List<Edge> edges) {}
+    public record Match(String id, String name, int distance, List<String> path, List<String> sources) {}
     private static final Map<String,String> LABELS=Map.of("Person","人物","Event","历史事件","Work","著作","Theme","主题","Region","地区","Attraction","景点");
     private static final Set<String> ENTITY_KINDS=Set.of("Person","Work","Theme");
     private static final Set<String> RELATION_TYPES=Set.of("RELATED_TO_PERSON","PARTICIPATED_IN","RELATED_TO_WORK","BELONGS_TO_THEME");
@@ -69,6 +70,27 @@ public class GraphService implements AutoCloseable {
     }
     public List<Attraction> attractions(String region) {
         try(Session session=driver.session()){return session.executeRead(tx->tx.run("MATCH (a:Attraction) WHERE $region = '' OR a.region = $region RETURN a ORDER BY a.id",Map.of("region",region==null?"":region)).list(r->{var a=r.get("a");return new Attraction(a.get("id").asLong(),a.get("name").asString(),a.get("region").asString(),a.get("theme").asString(),a.get("description").asString(),a.get("image").asString(),a.get("sourceName").asString(),a.get("sourceUrl").asString());}));}
+    }
+    public Map<Long,List<Match>> matchInterests(String region, List<String> interests) {
+        if (interests.isEmpty()) return Map.of();
+        String query="MATCH p=(a:Attraction)-[:RELATED_TO_EVENT|RELATED_TO_PERSON|BELONGS_TO_THEME|PARTICIPATED_IN|RELATED_TO_WORK*1..2]->(n) "
+            + "WHERE ($region = '' OR a.region = $region) AND (n:Person OR n:Event OR n:Work OR n:Theme) AND n.id IN $interests "
+            + "RETURN a.id AS attractionId,n.id AS interestId,n.name AS name,length(p) AS distance, "
+            + "[node IN nodes(p) | node.name] AS path,[rel IN relationships(p) | coalesce(rel.sourceUrl,'')] AS sources "
+            + "ORDER BY a.id,n.id,length(p),[node IN nodes(p) | node.name]";
+        try (Session session=driver.session()) {
+            return session.executeRead(tx -> {
+                Map<Long,LinkedHashMap<String,Match>> byAttraction=new LinkedHashMap<>();
+                for (var row:tx.run(query,Map.of("region",region==null?"":region,"interests",interests)).list()) {
+                    long attractionId=row.get("attractionId").asLong(); String interestId=row.get("interestId").asString();
+                    Match match=new Match(interestId,row.get("name").asString(),row.get("distance").asInt(),row.get("path").asList(v->v.asString()),row.get("sources").asList(v->v.asString()));
+                    byAttraction.computeIfAbsent(attractionId,k->new LinkedHashMap<>()).putIfAbsent(interestId,match);
+                }
+                Map<Long,List<Match>> result=new HashMap<>();
+                byAttraction.forEach((key,value)->result.put(key,List.copyOf(value.values())));
+                return result;
+            });
+        }
     }
     private String id(Node n){return n.hasLabel("Attraction")?"attraction-"+n.get("id").asLong():n.hasLabel("Region")?"region-"+n.get("name").asString():n.get("id").asString();}
     private GraphNode node(Node n,String fallback){String label=LABELS.entrySet().stream().filter(e->n.hasLabel(e.getKey())).map(Map.Entry::getValue).findFirst().orElse("实体");return new GraphNode(id(n),n.get("name").asString(),label,n.get("sourceUrl").asString(fallback));}
