@@ -27,7 +27,7 @@ onMounted(load)
     <div class="intro-strip"><div class="container intro-inner"><p><span class="strip-dot"></span> 每一次出发，都是一次与历史的相遇</p><span>探索 · 发现 · 记忆</span></div></div>
     <div class="container main-content">
       <section id="recommend" class="recommend-section"><div class="section-heading"><div><p class="overline">YOUR JOURNEY <span> / 01</span></p><h2>找到属于你的旅程</h2><p class="section-desc">选择目的地与感兴趣的主题，发现适合你的红色文化之旅。</p></div><span class="heading-symbol">旅</span></div>
-        <div class="search-panel"><div class="panel-intro"><span class="panel-number">01 / 旅程偏好</span><strong>从这里出发</strong><small>选择你想了解的地方与故事</small></div><div class="controls"><label><span>目的地</span><select v-model="region" @change="load"><option>延安</option><option>榆林</option><option value="">全部地区</option></select></label><label><span>感兴趣的主题</span><select v-model="theme"><option>革命旧址</option><option>红色地标</option><option value="">不限主题</option></select></label><button @click="recommend" :disabled="loading">{{ loading ? '正在推荐…' : '为我推荐' }} <span>↗</span></button></div></div>
+        <div class="search-panel"><div class="panel-intro"><span class="panel-number">01 / 旅程偏好</span><strong>从这里出发</strong><small>选择你想了解的地方与故事</small></div><div class="controls"><label><span>目的地</span><select v-model="region" @change="load"><option>延安</option><option>榆林</option><option value="">全部地区</option></select></label><label><span>感兴趣的主题</span><select v-model="theme"><option>革命旧址</option><option>红色地标</option><option>纪念馆</option><option value="">不限主题</option></select></label><button @click="recommend" :disabled="loading">{{ loading ? '正在推荐…' : '为我推荐' }} <span>↗</span></button></div></div>
         <p v-if="error" role="alert" class="error">{{ error }}</p>
         <div v-if="searched" class="results"><div class="result-title"><div><p class="overline">CURATED FOR YOU</p><h3>为你推荐</h3></div><span>根据你的选择生成</span></div><div v-if="recommendations.length" class="result-grid"><article v-for="item in recommendations" :key="item.id" class="result-card"><span class="tag">{{ item.theme }}</span><h4>{{ item.name }}</h4><p class="location">{{ item.region }} · 陕北</p><p class="reason">{{ item.reason }}</p></article></div><p v-else class="empty">暂无符合条件的推荐，请尝试其他地区。</p></div>
       </section>
@@ -42,3 +42,4 @@ onMounted(load)
   </main>
   <footer><div class="container footer-inner"><div><strong>陕北红色文旅</strong><p>在行走中，触摸历史的温度。</p></div><div class="footer-right">毕业设计项目<br><span>景点内容附资料来源</span></div></div></footer>
 </template>
+

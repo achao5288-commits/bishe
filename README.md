@@ -1,6 +1,6 @@
 # 陕北红色文旅智能推荐系统
 
-Vue 3 + Spring Boot + Neo4j 的毕业设计项目。当前收录延安市杨家岭革命旧址、枣园革命旧址和宝塔山三个景点。每条景点资料和图谱关系均提供公开来源；图片是 AI 生成的主题插画，不是实景照片。开放时间、票价等动态信息请以景区官方发布为准。
+Vue 3 + Spring Boot + Neo4j 的毕业设计项目。当前收录延安市杨家岭革命旧址、枣园革命旧址、宝塔山、延安革命纪念馆、王家坪革命旧址和南泥湾革命旧址六个景点。每条景点资料和图谱关系均提供公开来源；图片是 AI 生成的主题插画，不是实景照片。开放时间、票价等动态信息请以景区官方发布为准。
 
 ## 已实现
 
@@ -17,8 +17,24 @@ Vue 3 + Spring Boot + Neo4j 的毕业设计项目。当前收录延安市杨家�
 - 杨家岭与中共七大：[中央纪委国家监委网站](https://www.ccdi.gov.cn/toutiao/202105/t20210503_241354.html)。
 - 枣园与中共中央书记处：[陕西档案信息网](https://daj.shaanxi.gov.cn/Article/View?id=4757)。
 - 宝塔山与延安革命纪念地：[文化和旅游部数据服务](https://sjfw.mct.gov.cn/site/dataservice/culdetails?curId=10&id=35098)。
+- 延安革命纪念馆：[中央纪委国家监委网站](https://m.ccdi.gov.cn/content/dd/63/5314.html)。
+- 王家坪革命旧址：[彰武县人民政府](https://www.zhangwu.gov.cn/content/2018/636742.html)。
+- 南泥湾革命旧址：[陕西档案信息网](https://daj.shaanxi.gov.cn/Article/View?id=4757)。
 
 应用启动时按稳定 ID 执行 MERGE 写入种子和关系；重复启动不会重复创建节点。种子字段会覆盖数据库中同 ID 的对应字段，新增或修订资料请修改种子并核对来源。种子不会自动删除已从文件移除的旧节点或关系，删除需单独管理。勿在未备份的共享或生产数据库上运行此初始化流程。
+
+## 资料采集与人工审核
+
+搜狐攻略文章可作为人工发现景点的线索，但该站点的 robots.txt 对本项目采集程序禁止抓取该文章，实际检查记录见 `data/collection-check.json`。攻略含 AI 生成内容；票价、预约、交通等信息未经核验，不纳入项目数据。新增景点和关系由人工通过官方或公共机构资料核对后录入，不自动同步到图谱。
+
+采集工具 `tools/crawler/collector.py` 可处理用户指定的 HTTPS 页面。它先检查各站 robots.txt；禁止访问或规则不可取得时停止对应页面，不跟随重定向，仅记录标题及词表中命中的景点名称，不保存文章全文，也不自动修改 Neo4j。默认间隔两秒；只访问给定 URL，不发现或批量遍历链接。示例：
+
+```bash
+python tools/crawler/collector.py https://example.org/article --terms tools/crawler/terms.json --output data/candidates.json
+python -m unittest discover -s tools/crawler/tests -v
+```
+
+运行测试前可设置 `PYTHONPATH=tools/crawler`；Windows PowerShell 使用 `$env:PYTHONPATH="tools/crawler"`。对待审核结果进行来源核实、图片版权检查和人工编辑后，才可更新种子数据。采集工具仅用于明确允许抓取的页面，不能绕过站点权限或反爬限制。
 
 ## 本地启动
 

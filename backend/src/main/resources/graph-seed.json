@@ -1,15 +1,108 @@
 {
- "attractions": [
-  {"id":1,"name":"杨家岭革命旧址","region":"延安","theme":"革命旧址","description":"中共中央机关曾驻于此，中共七大在这里召开。","image":"/images/yangjialing.png","sourceName":"中央纪委国家监委网站","sourceUrl":"https://www.ccdi.gov.cn/toutiao/202105/t20210503_241354.html"},
-  {"id":2,"name":"枣园革命旧址","region":"延安","theme":"革命旧址","description":"1944年至1947年3月，中共中央书记处驻于枣园。","image":"/images/zaoyuan.png","sourceName":"陕西档案信息网","sourceUrl":"https://daj.shaanxi.gov.cn/Article/View?id=4757"},
-  {"id":3,"name":"宝塔山","region":"延安","theme":"红色地标","description":"宝塔山是延安的标志性景观，也是延安革命纪念地景区的组成部分。","image":"/images/baotashan.png","sourceName":"文化和旅游部数据服务","sourceUrl":"https://sjfw.mct.gov.cn/site/dataservice/culdetails?curId=10&id=35098"}
- ],
- "events": [
-  {"id":"event-7th-congress","name":"中国共产党第七次全国代表大会","sourceUrl":"https://www.ccdi.gov.cn/toutiao/202105/t20210503_241354.html"},
-  {"id":"event-secretariat","name":"中共中央书记处驻枣园","sourceUrl":"https://daj.shaanxi.gov.cn/Article/View?id=4757"}
- ],
- "links": [
-  {"attractionId":1,"eventId":"event-7th-congress","sourceUrl":"https://www.ccdi.gov.cn/toutiao/202105/t20210503_241354.html"},
-  {"attractionId":2,"eventId":"event-secretariat","sourceUrl":"https://daj.shaanxi.gov.cn/Article/View?id=4757"}
- ]
+  "attractions": [
+    {
+      "id": 1,
+      "name": "杨家岭革命旧址",
+      "region": "延安",
+      "theme": "革命旧址",
+      "description": "中共中央机关曾驻于此，中共七大在这里召开。",
+      "image": "/images/yangjialing.png",
+      "sourceName": "中央纪委国家监委网站",
+      "sourceUrl": "https://www.ccdi.gov.cn/toutiao/202105/t20210503_241354.html"
+    },
+    {
+      "id": 2,
+      "name": "枣园革命旧址",
+      "region": "延安",
+      "theme": "革命旧址",
+      "description": "1944年至1947年3月，中共中央书记处驻于枣园。",
+      "image": "/images/zaoyuan.png",
+      "sourceName": "陕西档案信息网",
+      "sourceUrl": "https://daj.shaanxi.gov.cn/Article/View?id=4757"
+    },
+    {
+      "id": 3,
+      "name": "宝塔山",
+      "region": "延安",
+      "theme": "红色地标",
+      "description": "宝塔山是延安的标志性景观，也是延安革命纪念地景区的组成部分。",
+      "image": "/images/baotashan.png",
+      "sourceName": "文化和旅游部数据服务",
+      "sourceUrl": "https://sjfw.mct.gov.cn/site/dataservice/culdetails?curId=10&id=35098"
+    },
+    {
+      "id": 4,
+      "name": "延安革命纪念馆",
+      "region": "延安",
+      "theme": "纪念馆",
+      "description": "纪念馆通过历史文物和资料，展示党中央在延安及陕甘宁边区领导革命的历程。",
+      "image": "/images/memorial.png",
+      "sourceName": "中央纪委国家监委网站",
+      "sourceUrl": "https://m.ccdi.gov.cn/content/dd/63/5314.html"
+    },
+    {
+      "id": 5,
+      "name": "王家坪革命旧址",
+      "region": "延安",
+      "theme": "革命旧址",
+      "description": "王家坪革命旧址是延安重要革命旧址，中央军委和八路军总部曾在这里工作。",
+      "image": "/images/wangjiaping.png",
+      "sourceName": "彰武县人民政府",
+      "sourceUrl": "https://www.zhangwu.gov.cn/content/2018/636742.html"
+    },
+    {
+      "id": 6,
+      "name": "南泥湾革命旧址",
+      "region": "延安",
+      "theme": "革命旧址",
+      "description": "南泥湾革命旧址与延安时期的大生产运动有关，三五九旅曾在这里屯垦。",
+      "image": "/images/nanniwan.png",
+      "sourceName": "陕西档案信息网",
+      "sourceUrl": "https://daj.shaanxi.gov.cn/Article/View?id=4757"
+    }
+  ],
+  "events": [
+    {
+      "id": "event-7th-congress",
+      "name": "中国共产党第七次全国代表大会",
+      "sourceUrl": "https://www.ccdi.gov.cn/toutiao/202105/t20210503_241354.html"
+    },
+    {
+      "id": "event-secretariat",
+      "name": "中共中央书记处驻枣园",
+      "sourceUrl": "https://daj.shaanxi.gov.cn/Article/View?id=4757"
+    },
+    {
+      "id": "event-military-headquarters",
+      "name": "中央军委和八路军总部驻王家坪",
+      "sourceUrl": "https://www.zhangwu.gov.cn/content/2018/636742.html"
+    },
+    {
+      "id": "event-nanniwan-production",
+      "name": "南泥湾大生产运动",
+      "sourceUrl": "https://daj.shaanxi.gov.cn/Article/View?id=4757"
+    }
+  ],
+  "links": [
+    {
+      "attractionId": 1,
+      "eventId": "event-7th-congress",
+      "sourceUrl": "https://www.ccdi.gov.cn/toutiao/202105/t20210503_241354.html"
+    },
+    {
+      "attractionId": 2,
+      "eventId": "event-secretariat",
+      "sourceUrl": "https://daj.shaanxi.gov.cn/Article/View?id=4757"
+    },
+    {
+      "attractionId": 5,
+      "eventId": "event-military-headquarters",
+      "sourceUrl": "https://www.zhangwu.gov.cn/content/2018/636742.html"
+    },
+    {
+      "attractionId": 6,
+      "eventId": "event-nanniwan-production",
+      "sourceUrl": "https://daj.shaanxi.gov.cn/Article/View?id=4757"
+    }
+  ]
 }
