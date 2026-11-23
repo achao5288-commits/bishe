@@ -27,7 +27,7 @@ class SecurityConfig {
   var converter=new JwtAuthenticationConverter();converter.setJwtGrantedAuthoritiesConverter(jwt->{var roles=jdbc.queryForList("SELECT role FROM app_users WHERE id=?",String.class,jwt.getSubject());if(roles.isEmpty())throw new org.springframework.security.authentication.BadCredentialsException("账户不可用");return java.util.List.of(new SimpleGrantedAuthority("ROLE_"+roles.getFirst()));});
   return http.csrf(c->c.disable()).sessionManagement(s->s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
    .authorizeHttpRequests(a->a.requestMatchers(HttpMethod.POST,"/api/auth/register","/api/auth/login").permitAll()
-    .requestMatchers(HttpMethod.GET,"/api/attractions","/api/attractions/**","/api/graph","/api/graph/**").permitAll()
+    .requestMatchers(HttpMethod.GET,"/api/health","/api/attractions","/api/attractions/**","/api/graph","/api/graph/**").permitAll()
     .requestMatchers(HttpMethod.POST,"/api/recommendations","/api/chat").permitAll()
     .requestMatchers("/api/evaluation/summary","/api/admin/**").hasRole("ADMIN")
     .requestMatchers("/api/me/**","/api/evaluation/**").authenticated().anyRequest().denyAll())

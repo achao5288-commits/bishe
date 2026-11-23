@@ -29,7 +29,7 @@ Vue 3 + Spring Boot + MySQL + Neo4j 的毕业设计项目，支持可选 Redis �
 
 ### Redis 缓存
 
-Redis 为可选组件，默认关闭，不配置时仍直接查询 Neo4j。用户换到配置了 Redis 的电脑后，在启动后端的环境中设置 `REDIS_CACHE_ENABLED=true`；连接参数为 `REDIS_HOST`、`REDIS_PORT` 和可选的 `REDIS_PASSWORD`，默认地址为 127.0.0.1:6379。本仓库 Compose 含仅绑定本机的 Redis 开发服务，未设置 Redis 密码；正式环境需设置访问控制、网络隔离和安全传输，不能使用该开发配置直接公开服务。
+Redis 为可选组件，默认关闭，不配置时仍直接查询 Neo4j。用户换到配置了 Redis 的电脑后，在启动后端的环境中设置 `REDIS_CACHE_ENABLED=true`；连接参数为 `REDIS_HOST`、`REDIS_PORT` 和可选的 `REDIS_PASSWORD`，默认地址为 127.0.0.1:6379。本仓库 Compose 的 Redis 默认不向宿主机公开端口，未设置 Redis 密码；正式环境需设置访问控制、网络隔离和安全传输，不能使用该开发配置直接公开服务。
 
 缓存采用 cache-aside：景点列表按地区缓存（默认 10 分钟）、全图及景点图谱缓存（默认 10 分钟）、推荐结果按完整请求参数缓存（默认 1 分钟）。TTL 可分别用 `REDIS_ATTRACTION_TTL`、`REDIS_GRAPH_TTL`、`REDIS_RECOMMENDATION_TTL` 配置，使用 `PT10M`、`PT1M` 等 ISO-8601 时长；非正值会绕过缓存。当前“景点缓存”覆盖经常访问的景点列表，并未实现按浏览量计算的热门景点排行榜。
 
@@ -179,15 +179,13 @@ python -m unittest discover -s tools/crawler/tests -v
 
 运行测试前可设置 `PYTHONPATH=tools/crawler`；Windows PowerShell 使用 `$env:PYTHONPATH="tools/crawler"`。对待审核结果进行来源核实、图片版权检查和人工编辑后，才可更新种子数据。采集工具仅用于明确允许抓取的页面，不能绕过站点权限或反爬限制。
 
-## 本地启动
+## Docker Compose 启动
 
-需要 Java 21、Maven 3.9+、Node.js 20+、MySQL 8.4 和 Neo4j 5.26，可选 Redis 7.4。先准备 MySQL 数据库 `red_tourism` 及专用账户 `red_tourism`，设置 `BISHE_MYSQL_PASSWORD`；也可以通过环境变量 `MYSQL_URL`、`MYSQL_USER` 自定义连接。请先启动 Neo4j 并创建本地开发用户 `neo4j`，示例密码为 `local-dev-password`。Docker Compose 启动前须设置 `BISHE_MYSQL_ROOT_PASSWORD` 和 `BISHE_MYSQL_PASSWORD`，两者不应提交到仓库：
+换到已安装 Docker 的电脑后，复制 `.env.example` 为 `.env` 并设置密码，在项目根目录运行 `docker compose up -d --build`，访问 http://127.0.0.1:8080。Redis 默认关闭，可按需启用。完整步骤见 [Docker Compose 部署指南](docs/Docker-Compose部署指南.md)。容器构建和实际联通仍需在目标电脑验证。
 
-```bash
-docker compose up -d
-```
+## 本地开发启动
 
-Compose 的 MySQL 和 Neo4j 端口只绑定本机。已有数据卷首次创建后，修改环境变量不会自动修改数据库账户密码，应在相应数据库中更改。自定义连接通过 `NEO4J_URI`、`NEO4J_USER`、`NEO4J_PASSWORD` 环境变量配置，默认分别为 `bolt://localhost:7687`、`neo4j` 和 `local-dev-password`。确保数据库已启动、账号密码正确且有创建约束及写入权限。应用启动时直接连接并初始化图谱，数据库不可用时应用启动失败。
+需要 Java 21、Maven 3.9+、Node.js 22.13+、MySQL 8.4 和 Neo4j 5.26，可选 Redis 7.4。先准备 MySQL 数据库 `red_tourism` 及专用账户 `red_tourism`，设置 `BISHE_MYSQL_PASSWORD`；也可以通过 `MYSQL_URL`、`MYSQL_USER` 自定义连接。通过 `NEO4J_URI`、`NEO4J_USER`、`NEO4J_PASSWORD` 配置图数据库连接，并确保账号有创建约束及写入权限。应用启动时初始化图谱。需要通过 Compose 只启动开发数据库时，请参阅部署指南；默认 Compose 不向宿主机公开数据库端口。
 
 ```bash
 cd backend

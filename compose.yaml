@@ -1,29 +1,85 @@
 services:
-  neo4j:
-    image: neo4j:5.26.0-community
+  frontend:
+    build:
+      context: ./frontend
     ports:
-      - "127.0.0.1:7474:7474"
-      - "127.0.0.1:7687:7687"
+      - "127.0.0.1:${WEB_PORT:-8080}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
     environment:
-      NEO4J_AUTH: "neo4j/${NEO4J_PASSWORD:-local-dev-password}"
-    volumes:
-      - neo4j_data:/data
+      MYSQL_URL: "jdbc:mysql://mysql:3306/red_tourism?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai"
+      MYSQL_USER: red_tourism
+      BISHE_MYSQL_PASSWORD: "${BISHE_MYSQL_PASSWORD:?Set BISHE_MYSQL_PASSWORD in .env}"
+      NEO4J_URI: bolt://neo4j:7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: "${NEO4J_PASSWORD:?Set NEO4J_PASSWORD in .env}"
+      APP_JWT_SECRET: "${APP_JWT_SECRET:?Set APP_JWT_SECRET in .env}"
+      APP_ADMIN_USERNAME: "${APP_ADMIN_USERNAME:-}"
+      APP_ADMIN_PASSWORD: "${APP_ADMIN_PASSWORD:-}"
+      DEEPSEEK_API_KEY: "${DEEPSEEK_API_KEY:-}"
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      REDIS_PASSWORD: "${REDIS_PASSWORD:-}"
+      REDIS_CACHE_ENABLED: "${REDIS_CACHE_ENABLED:-false}"
+      REDIS_ATTRACTION_TTL: "${REDIS_ATTRACTION_TTL:-PT10M}"
+      REDIS_GRAPH_TTL: "${REDIS_GRAPH_TTL:-PT10M}"
+      REDIS_RECOMMENDATION_TTL: "${REDIS_RECOMMENDATION_TTL:-PT1M}"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:8081/api/health || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+      start_period: 45s
+    restart: unless-stopped
+
   mysql:
     image: mysql:8.4
-    ports:
-      - "127.0.0.1:3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: "${BISHE_MYSQL_ROOT_PASSWORD:?Set BISHE_MYSQL_ROOT_PASSWORD}"
+      MYSQL_ROOT_PASSWORD: "${BISHE_MYSQL_ROOT_PASSWORD:?Set BISHE_MYSQL_ROOT_PASSWORD in .env}"
       MYSQL_DATABASE: red_tourism
       MYSQL_USER: red_tourism
-      MYSQL_PASSWORD: "${BISHE_MYSQL_PASSWORD:?Set BISHE_MYSQL_PASSWORD}"
+      MYSQL_PASSWORD: "${BISHE_MYSQL_PASSWORD:?Set BISHE_MYSQL_PASSWORD in .env}"
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=\"$${MYSQL_PASSWORD}\" mysql --protocol=tcp -h 127.0.0.1 -u \"$${MYSQL_USER}\" \"$${MYSQL_DATABASE}\" -e 'SELECT 1' >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 60s
+    restart: unless-stopped
+
+  neo4j:
+    image: neo4j:5.26.0-community
+    environment:
+      NEO4J_AUTH: "neo4j/${NEO4J_PASSWORD:?Set NEO4J_PASSWORD in .env}"
+    volumes:
+      - neo4j_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "cypher-shell -a bolt://127.0.0.1:7687 -u neo4j -p \"$${NEO4J_AUTH#*/}\" 'RETURN 1' >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 8s
+      retries: 18
+      start_period: 60s
+    restart: unless-stopped
+
   redis:
     image: redis:7.4-alpine
-    ports:
-      - "127.0.0.1:6379:6379"
+    profiles: ["cache"]
     command: ["redis-server", "--save", "", "--appendonly", "no"]
+    restart: unless-stopped
+
 volumes:
-  neo4j_data:
   mysql_data:
+  neo4j_data:
