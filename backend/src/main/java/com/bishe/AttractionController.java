@@ -3,6 +3,11 @@ import java.util.Comparator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.TreeMap;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
@@ -41,23 +46,33 @@ public class AttractionController {
             String reason=!evidence.isEmpty()?"关联您感兴趣的「"+evidence.stream().map(GraphService.Match::name).collect(java.util.stream.Collectors.joining("、"))+"」，可查看下方路径和来源。":!profileMatches.isEmpty()?"根据您收藏或浏览过的景点，发现与「"+profileMatches.stream().map(GraphService.Match::name).collect(java.util.stream.Collectors.joining("、"))+"」有关的内容。":themes.contains(a.theme())?"符合您选择的主题："+a.theme():"可作为浏览参考。";
             return new Recommendation(a.id(),a.name(),a.region(),a.theme(),reason,score,evidence,profileScore,profileMatches,0,0,score);
         }).toList();
-        return rerank(candidates,request);
+        return rerank(candidates,request,matches);
     }
-    private List<Recommendation> rerank(List<Recommendation> candidates, Request request) {
+    private List<Recommendation> rerank(List<Recommendation> candidates, Request request, Map<Long,List<GraphService.Match>> matches) {
         Set<Long> favorites=new HashSet<>(request.favoriteIds()==null?List.of():request.favoriteIds());
         Set<Long> history=new HashSet<>(request.historyIds()==null?List.of():request.historyIds());
         List<Recommendation> remaining=new ArrayList<>(candidates), result=new ArrayList<>();
+        Set<String> matchedIds=matches.values().stream().flatMap(List::stream).map(GraphService.Match::id).collect(java.util.stream.Collectors.toSet());
+        List<String> selected=request.interestIds()==null?List.of():request.interestIds().stream().filter(matchedIds::contains).distinct().sorted().toList();
+        Map<String,Integer> weights=new TreeMap<>();
+        if(request.profileInterests()!=null)request.profileInterests().forEach((id,weight)->{if(matchedIds.contains(id) && !selected.contains(id))weights.put(id,weight);});
+        boolean personalized=!favorites.isEmpty() || !history.isEmpty() || !selected.isEmpty() || !weights.isEmpty();
+        String signature=favorites.stream().sorted().toList()+"|"+history.stream().sorted().toList()+"|"+selected+"|"+weights;
         Map<String,Integer> themes=new HashMap<>(),regions=new HashMap<>();
         while(!remaining.isEmpty() && result.size()<request.limit()) {
             List<Recommendation> scored=remaining.stream().map(item->{
                 int repeat=favorites.contains(item.id())?50:history.contains(item.id())?30:0;
                 int diversity=8*Math.min(themes.getOrDefault(item.theme(),0),2)+3*Math.min(regions.getOrDefault(item.region(),0),2);
                 return new Recommendation(item.id(),item.name(),item.region(),item.theme(),item.reason(),item.score(),item.graphMatches(),item.profileScore(),item.profileMatches(),repeat,diversity,item.score()-repeat-diversity);
-            }).sorted(Comparator.comparingInt(Recommendation::rerankScore).reversed().thenComparingLong(Recommendation::id)).toList();
+            }).sorted(Comparator.comparingInt(Recommendation::rerankScore).reversed().thenComparingLong(item->personalized?tieHash(signature,item.id()):item.id()).thenComparingLong(Recommendation::id)).toList();
             Recommendation chosen=scored.getFirst(); result.add(chosen);
             remaining.removeIf(item->item.id()==chosen.id());
             themes.merge(chosen.theme(),1,Integer::sum);regions.merge(chosen.region(),1,Integer::sum);
         }
         return result;
+    }
+    private long tieHash(String signature,long id) {
+        try { byte[] hash=MessageDigest.getInstance("SHA-256").digest((signature+"|"+id).getBytes(StandardCharsets.UTF_8));return ByteBuffer.wrap(hash).getLong(); }
+        catch (NoSuchAlgorithmException e) { throw new IllegalStateException(e); }
     }
 }

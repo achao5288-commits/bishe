@@ -12,7 +12,7 @@ class DiversifiedRecommendationTest {
  @Autowired MockMvc mvc;
  @Test void alreadyVisitedSitesArePenalizedAndStillAvailable() throws Exception {
   mvc.perform(post("/api/recommendations").contentType(MediaType.APPLICATION_JSON).content("{\"region\":\"延安\",\"favoriteIds\":[1],\"historyIds\":[2,1],\"limit\":20}"))
-   .andExpect(status().isOk()).andExpect(jsonPath("$[0].id").value(3))
+   .andExpect(status().isOk()).andExpect(jsonPath("$[0].id").value(org.hamcrest.Matchers.not(org.hamcrest.Matchers.isOneOf(1,2))))
    .andExpect(jsonPath("$[?(@.id == 1)].repeatPenalty").value(org.hamcrest.Matchers.hasItem(50)))
    .andExpect(jsonPath("$[?(@.id == 2)].repeatPenalty").value(org.hamcrest.Matchers.hasItem(30)));
  }

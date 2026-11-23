@@ -22,3 +22,11 @@ test('published simulated data is complete and matches the report',()=>{
  assert.equal(keys.size,ratings.ratings.length);
  assert.ok(ratings.ratings.every(r=>r.origin==='synthetic' && r.rating>=1 && r.rating<=5));
 });
+test('published comparison preserves the frozen previous baseline',()=>{
+ const fs=require('node:fs'),path=require('node:path');
+ const previous=JSON.parse(fs.readFileSync(path.join(__dirname,'coverage-baseline.json'),'utf8'));
+ const report=JSON.parse(fs.readFileSync(path.join(__dirname,'../../frontend/public/data/synthetic-report.json'),'utf8'));
+ assert.deepEqual(report.mean.previous,previous.mean);
+ assert.deepEqual(report.cases.map(x=>x.id),previous.cases.map(x=>x.id));
+ for(const row of report.cases) assert.deepEqual(row.previous,previous.cases.find(c=>c.id===row.id).result);
+});
