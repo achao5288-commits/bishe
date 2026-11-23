@@ -8,5 +8,17 @@ services:
       NEO4J_AUTH: "neo4j/${NEO4J_PASSWORD:-local-dev-password}"
     volumes:
       - neo4j_data:/data
+  mysql:
+    image: mysql:8.4
+    ports:
+      - "127.0.0.1:3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "${BISHE_MYSQL_ROOT_PASSWORD:?Set BISHE_MYSQL_ROOT_PASSWORD}"
+      MYSQL_DATABASE: red_tourism
+      MYSQL_USER: red_tourism
+      MYSQL_PASSWORD: "${BISHE_MYSQL_PASSWORD:?Set BISHE_MYSQL_PASSWORD}"
+    volumes:
+      - mysql_data:/var/lib/mysql
 volumes:
   neo4j_data:
+  mysql_data:

@@ -14,11 +14,11 @@ class FeedbackController {
  record ExposureResponse(String id){}
  record FeedbackRequest(@NotBlank @Pattern(regexp=UUID_RE) String userId,@NotNull @Min(1) Long attractionId,@Pattern(regexp=UUID_RE) String exposureId,@NotNull @Min(1) @Max(5) Integer rating,@Size(max=500) String comment){}
  record DeleteRequest(@NotBlank @Pattern(regexp=UUID_RE) String userId){}
- private final FeedbackService service;private final GraphService graph;
- FeedbackController(FeedbackService service,GraphService graph){this.service=service;this.graph=graph;}
+ private final FeedbackStore service;private final GraphService graph;
+ FeedbackController(FeedbackStore service,GraphService graph){this.service=service;this.graph=graph;}
  private Set<Long> validIds(){return graph.attractions(null).stream().map(GraphService.Attraction::id).collect(Collectors.toSet());}
- @PostMapping("/exposures") ExposureResponse exposure(@Valid @RequestBody ExposureRequest request){if(!validIds().containsAll(request.attractionIds()))throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"包含未知景点");return new ExposureResponse(service.exposure(request.userId(),request.attractionIds()).id());}
- @PostMapping("/feedback") @ResponseStatus(HttpStatus.NO_CONTENT) void feedback(@Valid @RequestBody FeedbackRequest request){if(!validIds().contains(request.attractionId()))throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"景点不存在");try{service.feedback(request.userId(),request.attractionId(),request.exposureId(),request.rating(),request.comment());}catch(IllegalArgumentException e){throw new ResponseStatusException(HttpStatus.BAD_REQUEST,e.getMessage());}}
+ @PostMapping("/exposures") ExposureResponse exposure(@Valid @RequestBody ExposureRequest request,java.security.Principal principal){if(!validIds().containsAll(request.attractionIds()))throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"包含未知景点");return new ExposureResponse(service.exposure(principal.getName(),request.attractionIds()).id());}
+ @PostMapping("/feedback") @ResponseStatus(HttpStatus.NO_CONTENT) void feedback(@Valid @RequestBody FeedbackRequest request,java.security.Principal principal){if(!validIds().contains(request.attractionId()))throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"景点不存在");try{service.feedback(principal.getName(),request.attractionId(),request.exposureId(),request.rating(),request.comment());}catch(IllegalArgumentException e){throw new ResponseStatusException(HttpStatus.BAD_REQUEST,e.getMessage());}}
  @GetMapping("/summary") FeedbackService.Summary summary(){return service.summary();}
- @PostMapping("/delete-own") @ResponseStatus(HttpStatus.NO_CONTENT) void delete(@Valid @RequestBody DeleteRequest request){service.delete(request.userId());}
+ @PostMapping("/delete-own") @ResponseStatus(HttpStatus.NO_CONTENT) void delete(@Valid @RequestBody DeleteRequest request,java.security.Principal principal){service.delete(principal.getName());}
 }

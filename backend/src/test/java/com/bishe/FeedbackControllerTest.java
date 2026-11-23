@@ -13,7 +13,7 @@ class FeedbackControllerTest {
  @TempDir Path temp;
  @Test void validatesInputsAndExposesOnlyAggregateData() throws Exception {
   var graph=mock(GraphService.class);when(graph.attractions(null)).thenReturn(List.of(new GraphService.Attraction(1,"地点","延安","主题","","","","",List.of())));
-  var mvc=MockMvcBuilders.standaloneSetup(new FeedbackController(new FeedbackService(temp.resolve("data.json"),new ObjectMapper()),graph)).build();
+  var mvc=MockMvcBuilders.standaloneSetup(new FeedbackController(new FeedbackService(temp.resolve("data.json"),new ObjectMapper()),graph)).defaultRequest(get("/").principal(()->"d68b0d7a-53ed-4434-a10f-3473ab4ee248")).build();
   String user="d68b0d7a-53ed-4434-a10f-3473ab4ee248";
   mvc.perform(post("/api/evaluation/feedback").contentType(MediaType.APPLICATION_JSON).content("{\"userId\":\""+user+"\",\"attractionId\":1,\"rating\":6}" )).andExpect(status().isBadRequest());
   mvc.perform(post("/api/evaluation/feedback").contentType(MediaType.APPLICATION_JSON).content("{\"userId\":\""+user+"\",\"attractionId\":2,\"rating\":5}" )).andExpect(status().isBadRequest());
@@ -22,7 +22,7 @@ class FeedbackControllerTest {
  }
  @Test void exposureRatingIsCountedOnlyForTheShownPosition() throws Exception {
   var graph=mock(GraphService.class);when(graph.attractions(null)).thenReturn(List.of(new GraphService.Attraction(1,"地点","延安","主题","","","","",List.of())));
-  var mvc=MockMvcBuilders.standaloneSetup(new FeedbackController(new FeedbackService(temp.resolve("joined.json"),new ObjectMapper()),graph)).build();
+  var mvc=MockMvcBuilders.standaloneSetup(new FeedbackController(new FeedbackService(temp.resolve("joined.json"),new ObjectMapper()),graph)).defaultRequest(get("/").principal(()->"d68b0d7a-53ed-4434-a10f-3473ab4ee248")).build();
   String user="d68b0d7a-53ed-4434-a10f-3473ab4ee248";
   var result=mvc.perform(post("/api/evaluation/exposures").contentType(MediaType.APPLICATION_JSON).content("{\"userId\":\""+user+"\",\"attractionIds\":[1]}")).andExpect(status().isOk()).andReturn();
   String exposure=new ObjectMapper().readTree(result.getResponse().getContentAsString()).get("id").asText();
