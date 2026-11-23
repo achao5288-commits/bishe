@@ -1,0 +1,132 @@
+{
+  "description": "人工设计的演示场景和相关性标注，非真实用户反馈；仅用于检查方法和复现比较。",
+  "cases": [
+    {
+      "id": "luochuan-and-mao",
+      "region": "延安",
+      "themes": [
+        "纪念馆"
+      ],
+      "interestIds": [
+        "event-luochuan",
+        "person-mao"
+      ],
+      "relevance": {
+        "1": 1,
+        "9": 1,
+        "13": 3
+      }
+    },
+    {
+      "id": "xiaohe-and-mao",
+      "region": "榆林",
+      "themes": [
+        "革命旧址"
+      ],
+      "interestIds": [
+        "event-xiaohe",
+        "person-mao"
+      ],
+      "relevance": {
+        "7": 2,
+        "8": 3,
+        "12": 2
+      }
+    },
+    {
+      "id": "suide-rural",
+      "region": "榆林",
+      "themes": [],
+      "interestIds": [
+        "person-wangzhen",
+        "person-xizhongxun"
+      ],
+      "relevance": {
+        "14": 3,
+        "15": 2
+      }
+    },
+    {
+      "id": "nanniwan",
+      "region": "延安",
+      "themes": [
+        "革命旧址"
+      ],
+      "interestIds": [
+        "event-nanniwan-production",
+        "person-wangzhen"
+      ],
+      "relevance": {
+        "6": 3
+      }
+    },
+    {
+      "id": "december-work",
+      "region": "榆林",
+      "themes": [
+        "革命旧址"
+      ],
+      "interestIds": [
+        "event-december",
+        "work-current"
+      ],
+      "relevance": {
+        "7": 3
+      }
+    },
+    {
+      "id": "luochuan-program",
+      "region": "延安",
+      "themes": [],
+      "interestIds": [
+        "event-luochuan",
+        "work-ten-point"
+      ],
+      "relevance": {
+        "13": 3
+      }
+    },
+    {
+      "id": "haojiaqiao",
+      "region": "榆林",
+      "themes": [
+        "革命旧址"
+      ],
+      "interestIds": [
+        "event-haojiaqiao",
+        "person-liuyuhou"
+      ],
+      "relevance": {
+        "14": 1,
+        "15": 3
+      }
+    },
+    {
+      "id": "liuzhidan",
+      "region": "延安",
+      "themes": [
+        "红色地标"
+      ],
+      "interestIds": [
+        "event-liuzhidan",
+        "person-liuzhidan"
+      ],
+      "relevance": {
+        "16": 3
+      }
+    },
+    {
+      "id": "event-versus-person-example",
+      "region": "延安",
+      "themes": [],
+      "interestIds": [
+        "event-luochuan",
+        "person-wangzhen"
+      ],
+      "relevance": {
+        "6": 2,
+        "13": 3
+      }
+    }
+  ]
+}

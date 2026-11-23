@@ -2,10 +2,10 @@
 import { ref, onMounted, nextTick, defineAsyncComponent, watch } from 'vue'
 const GraphView = defineAsyncComponent(() => import('./GraphView.vue'))
 const ChatPanel = defineAsyncComponent(() => import('./ChatPanel.vue'))
-const attractions = ref([]), recommendations = ref([]), region = ref('延安'), theme = ref('革命旧址'), error = ref(''), loading = ref(false), searched = ref(false), graph = ref(null), graphError = ref(''), graphLoading = ref(false), graphTitle = ref(''), interestId = ref(''), interestNodes = ref([]), interestsError = ref(false), story = ref(null), storyLoading = ref(false), storyError = ref('')
+const attractions = ref([]), recommendations = ref([]), region = ref('延安'), theme = ref('革命旧址'), error = ref(''), loading = ref(false), searched = ref(false), graph = ref(null), graphError = ref(''), graphLoading = ref(false), graphTitle = ref(''), interestIds = ref([]), interestNodes = ref([]), interestsError = ref(false), story = ref(null), storyLoading = ref(false), storyError = ref('')
 let recommendationVersion = 0
 function clearRecommendations() { recommendationVersion++; recommendations.value = []; searched.value = false; loading.value = false }
-watch([theme, interestId], clearRecommendations)
+watch([theme, interestIds], clearRecommendations, { deep: true })
 async function load() {
   error.value = ''; graph.value = null; closeStory(); storyError.value = ''; clearRecommendations()
   try { const r = await fetch('/api/attractions?' + new URLSearchParams({region: region.value})); if (!r.ok) throw Error(); attractions.value = await r.json() }
@@ -14,7 +14,7 @@ async function load() {
 async function recommend() {
   const version = ++recommendationVersion
   loading.value = true; error.value = ''
-  try { const r = await fetch('/api/recommendations', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({region:region.value, themes: theme.value ? [theme.value] : [], interestIds: interestId.value ? [interestId.value] : [], limit:5})}); if (!r.ok) throw Error(); const data = await r.json(); if (version === recommendationVersion) { recommendations.value = data; searched.value = true } }
+  try { const r = await fetch('/api/recommendations', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({region:region.value, themes: theme.value ? [theme.value] : [], interestIds: interestIds.value, limit:5})}); if (!r.ok) throw Error(); const data = await r.json(); if (version === recommendationVersion) { recommendations.value = data; searched.value = true } }
   catch { if (version === recommendationVersion) { recommendations.value = []; error.value = '推荐请求失败，请稍后重试。' } }
   finally { if (version === recommendationVersion) loading.value = false }
 }
@@ -38,7 +38,7 @@ async function loadInterests() {
   try { const r = await fetch('/api/graph'); if (!r.ok) throw Error(); const data = await r.json(); interestNodes.value = data.nodes.filter(n => ['人物', '历史事件', '著作', '主题'].includes(n.label)).sort((a,b) => a.name.localeCompare(b.name, 'zh-CN')); interestsError.value = false }
   catch { interestNodes.value = []; interestsError.value = true }
 }
-function chooseInterest(id) { interestId.value = id; document.getElementById('recommend')?.scrollIntoView({ behavior: 'smooth', block: 'start' }) }
+function chooseInterest(id) { if (!interestIds.value.includes(id) && interestIds.value.length < 10) interestIds.value = [...interestIds.value, id]; document.getElementById('recommend')?.scrollIntoView({ behavior: 'smooth', block: 'start' }) }
 onMounted(() => { load(); loadInterests() })
 </script>
 <template>
@@ -48,9 +48,9 @@ onMounted(() => { load(); loadInterests() })
     <div class="intro-strip"><div class="container intro-inner"><p><span class="strip-dot"></span> 每一次出发，都是一次与历史的相遇</p><span>探索 · 发现 · 记忆</span></div></div>
     <div class="container main-content">
       <section id="recommend" class="recommend-section"><div class="section-heading"><div><p class="overline">YOUR JOURNEY <span> / 01</span></p><h2>找到属于你的旅程</h2><p class="section-desc">选择目的地与感兴趣的主题，发现适合你的红色文化之旅。</p></div><span class="heading-symbol">旅</span></div>
-        <div class="search-panel"><div class="panel-intro"><span class="panel-number">01 / 旅程偏好</span><strong>从这里出发</strong><small>选择你想了解的地方与故事</small></div><div class="controls"><label><span>目的地</span><select v-model="region" @change="load"><option>延安</option><option>榆林</option><option value="">全部地区</option></select></label><label><span>感兴趣的主题</span><select v-model="theme"><option>革命旧址</option><option>红色地标</option><option>纪念馆</option><option value="">不限主题</option></select></label><label><span>历史人物、事件或著作</span><select v-model="interestId" :disabled="interestsError"><option value="">不限知识兴趣</option><option v-for="node in interestNodes" :key="node.id" :value="node.id">{{ node.name }} · {{ node.label }}</option></select></label><button @click="recommend" :disabled="loading">{{ loading ? '正在推荐…' : '为我推荐' }} <span>↗</span></button></div></div>
+        <div class="search-panel"><div class="panel-intro"><span class="panel-number">01 / 旅程偏好</span><strong>从这里出发</strong><small>选择你想了解的地方与故事</small></div><div class="controls"><label><span>目的地</span><select v-model="region" @change="load"><option>延安</option><option>榆林</option><option value="">全部地区</option></select></label><label><span>感兴趣的主题</span><select v-model="theme"><option>革命旧址</option><option>红色地标</option><option>纪念馆</option><option value="">不限主题</option></select></label><div class="interest-picker"><span id="interest-label">历史人物、事件或著作</span><details><summary aria-labelledby="interest-label">已选 {{ interestIds.length }} 项（最多 10 项）</summary><fieldset :disabled="interestsError"><legend>选择知识兴趣</legend><label v-for="node in interestNodes" :key="node.id"><input type="checkbox" v-model="interestIds" :value="node.id" :disabled="interestIds.length >= 10 && !interestIds.includes(node.id)"><span>{{ node.name }} · {{ node.label }}</span></label></fieldset></details></div><button @click="recommend" :disabled="loading">{{ loading ? '正在推荐…' : '为我推荐' }} <span>↗</span></button></div></div>
         <p v-if="error" role="alert" class="error">{{ error }}</p><p v-if="interestsError" role="alert" class="error">知识兴趣加载失败，仍可按地区和主题推荐。</p>
-        <div v-if="searched" class="results"><div class="result-title"><div><p class="overline">CURATED FOR YOU</p><h3>为你推荐</h3></div><span>根据你的选择生成</span></div><div v-if="recommendations.length" class="result-grid"><article v-for="item in recommendations" :key="item.id" class="result-card"><span class="tag">{{ item.theme }}</span><h4>{{ item.name }}</h4><p class="location">{{ item.region }} · 陕北</p><p class="reason">{{ item.reason }}</p><div v-for="match in item.graphMatches" :key="match.id" class="recommend-evidence"><span>关联路径：{{ match.path.join(' → ') }}（{{ match.distance }} 跳）</span><div><a v-for="(url, index) in match.sources" :key="index" :href="url" target="_blank" rel="noopener noreferrer">依据{{ index + 1 }} ↗</a></div></div></article></div><p v-else class="empty">暂无符合条件的推荐，请尝试其他地区。</p></div>
+        <div v-if="searched" class="results"><div class="result-title"><div><p class="overline">CURATED FOR YOU</p><h3>为你推荐</h3></div><span>根据你的选择生成</span></div><div v-if="recommendations.length" class="result-grid"><article v-for="item in recommendations" :key="item.id" class="result-card"><span class="tag">{{ item.theme }}</span><h4>{{ item.name }}</h4><p class="location">{{ item.region }} · 陕北</p><p class="reason">{{ item.reason }}</p><div v-for="match in item.graphMatches" :key="match.id" class="recommend-evidence"><span>关联路径：{{ match.path.join(' → ') }}（{{ match.distance }} 跳，{{ match.points }} 分）</span><small>关系类型：{{ match.relationTypes.map(type => relationNames[type] || type).join(' → ') }}</small><div><a v-for="(url, index) in match.sources" :key="index" :href="url" target="_blank" rel="noopener noreferrer">依据{{ index + 1 }} ↗</a></div></div></article></div><p v-else class="empty">暂无符合条件的推荐，请尝试其他地区。</p></div>
       </section>
       <section id="discover" class="discover-section"><div class="section-heading"><div><p class="overline">EXPLORE SHANBEI <span> / 02</span></p><h2>在陕北，发现故事</h2><p class="section-desc">山川有迹，历史有声。以旅行为线索，重新认识红色文化。</p></div><div class="section-aside"><span>SELECTED PLACES</span><strong>地方记忆</strong></div></div>
         <button class="all-graph-button" @click="showGraph(null)">查看完整知识图谱 <span>↗</span></button><div class="demo-note"><span>资料说明</span> 景点内容参考公开资料；配图为 AI 主题插画，并非实景照片。开放信息请以景区官方发布为准。</div>

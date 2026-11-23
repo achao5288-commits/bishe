@@ -26,8 +26,8 @@ public class AttractionController {
         Map<Long,List<GraphService.Match>> matches=graph.matchInterests(request.region(),interests);
         return graph.attractions(request.region()).stream().map(a->{
             List<GraphService.Match> evidence=matches.getOrDefault(a.id(),List.of());
-            int score=(themes.contains(a.theme())?20:0)+evidence.stream().mapToInt(m->m.distance()==1?60:30).sum();
-            String reason=!evidence.isEmpty()?"与您感兴趣的「"+evidence.get(0).name()+"」存在知识关联。":themes.contains(a.theme())?"符合您选择的主题："+a.theme():"可作为浏览参考。";
+            int score=(themes.contains(a.theme())?20:0)+evidence.stream().mapToInt(GraphService.Match::points).sum();
+            String reason=!evidence.isEmpty()?"关联您感兴趣的「"+evidence.stream().map(GraphService.Match::name).collect(java.util.stream.Collectors.joining("、"))+"」，可查看下方路径和来源。":themes.contains(a.theme())?"符合您选择的主题："+a.theme():"可作为浏览参考。";
             return new Recommendation(a.id(),a.name(),a.region(),a.theme(),reason,score,evidence);
         }).sorted(Comparator.comparingInt(Recommendation::score).reversed().thenComparingLong(Recommendation::id)).limit(request.limit()).toList();
     }
