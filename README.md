@@ -1,6 +1,6 @@
 # 陕北红色文旅智能推荐系统
 
-Vue 3 + Spring Boot + MySQL + Neo4j 的毕业设计项目。当前收录延安市和榆林市的十六处红色景点，包括凤凰山、瓦窑堡、吴起、杨家沟、小河和神泉堡等。每条景点资料和图谱关系均提供公开来源；图片是 AI 生成的主题插画，不是实景照片。开放时间、票价等动态信息请以景区官方发布为准。
+Vue 3 + Spring Boot + MySQL + Neo4j 的毕业设计项目，支持可选 Redis 缓存。当前收录延安市和榆林市的十六处红色景点，包括凤凰山、瓦窑堡、吴起、杨家沟、小河和神泉堡等。每条景点资料和图谱关系均提供公开来源；图片是 AI 生成的主题插画，不是实景照片。开放时间、票价等动态信息请以景区官方发布为准。
 
 ## 已实现
 
@@ -9,6 +9,7 @@ Vue 3 + Spring Boot + MySQL + Neo4j 的毕业设计项目。当前收录延安�
 - 每个景点单独配有插画和分段历史故事；每个故事段落附有资料来源。
 - 智能问答基于已整理的故事和 Neo4j 关系检索，并使用 DeepSeek 模型生成回答；展示检索来源。
 - 景点和推荐结果支持 1–5 分及文字反馈；用户可自愿开启推荐展示记录。
+- 可选 Redis 缓存景点列表、图谱和推荐结果，支持管理员刷新与缓存异常回退。
 
 已支持账号注册登录、普通用户及管理员角色；登录后的收藏、浏览、展示记录和评分保存在 MySQL。未登录时收藏与浏览仍保存在当前浏览器。本机旧记录不会自动并入账号；尚未实现路线规划和景点内容后台。目前榆林收录杨家沟、小河、神泉堡、绥德县革命历史纪念馆和郝家桥五处地点，覆盖范围仍可继续扩展。
 
@@ -25,6 +26,27 @@ Vue 3 + Spring Boot + MySQL + Neo4j 的毕业设计项目。当前收录延安�
 ```
 
 返回的 `score` 是基础相关性分，`rerankScore` 是当前位置的重排分；`graphMatches` 中的 `relationTypes`、`points`、`path` 与 `sources` 说明每条命中和来源。当前图谱接口最多返回 500 条关系；大规模数据需要分页或按子图查询。
+
+### Redis 缓存
+
+Redis 为可选组件，默认关闭，不配置时仍直接查询 Neo4j。用户换到配置了 Redis 的电脑后，在启动后端的环境中设置 `REDIS_CACHE_ENABLED=true`；连接参数为 `REDIS_HOST`、`REDIS_PORT` 和可选的 `REDIS_PASSWORD`，默认地址为 127.0.0.1:6379。本仓库 Compose 含仅绑定本机的 Redis 开发服务，未设置 Redis 密码；正式环境需设置访问控制、网络隔离和安全传输，不能使用该开发配置直接公开服务。
+
+缓存采用 cache-aside：景点列表按地区缓存（默认 10 分钟）、全图及景点图谱缓存（默认 10 分钟）、推荐结果按完整请求参数缓存（默认 1 分钟）。TTL 可分别用 `REDIS_ATTRACTION_TTL`、`REDIS_GRAPH_TTL`、`REDIS_RECOMMENDATION_TTL` 配置，使用 `PT10M`、`PT1M` 等 ISO-8601 时长；非正值会绕过缓存。当前“景点缓存”覆盖经常访问的景点列表，并未实现按浏览量计算的热门景点排行榜。
+
+推荐缓存键包含完整请求参数的 SHA-256 摘要，包括兴趣、画像、收藏和浏览编号；不同请求不会共用错误结果，账号令牌不进入缓存键或值。**摘要不等于保密**：推荐结果本身可能反映兴趣，需保护 Redis 的访问权限。收藏或浏览变化后前端发送的新参数会形成新缓存键；缓存不会存储账户资料、评分或认证信息。
+
+应用启动会生成新的本进程缓存命名空间，旧缓存按 TTL 过期；管理员可在“管理用户权限”中点击“刷新景点、图谱和推荐缓存”，或调用需要管理员 JWT 的 `POST /api/admin/cache/invalidate`。修改种子并重启或直接修改 Neo4j 后，应重启服务或手动刷新缓存；未刷新时图谱或景点旧值最多可能保留图谱 TTL，推荐的 1 分钟 TTL 不能单独保证源数据新鲜。刷新切换命名空间，不执行 Redis 全库删除；刷新期间已开始的请求可能返回旧结果，但之后的新请求不会读取旧命名空间。当前刷新和热点锁均为**单进程范围**，多实例部署需为每个实例刷新或实现共享版本及分布式协调。
+
+Redis 连接或读写失败会回退到原始查询，并短暂暂停缓存访问后重试；同一进程对同一热点缓存键的并发回源使用分段锁合并，不能替代多实例防击穿方案。不存在的景点及查询异常不缓存。
+
+本机未配置 Redis，自动测试使用模拟 Redis 验证命中、隔离、刷新、并发和回退，**不能视为真实 Redis 联通测试**。换电脑启动 Redis、MySQL 和 Neo4j 后，可在启动后端之前设置连接参数及 `REDIS_CACHE_ENABLED=true`；要运行真实 Redis 冒烟测试，可在后端测试环境设置 `REDIS_INTEGRATION=true` 后执行：
+
+```sh
+cd backend
+mvn -Dtest=RealRedisIntegrationTest test
+```
+
+该测试只写入有 5 秒 TTL 的独立测试键，不执行 FLUSHDB；默认未配置环境变量时测试跳过。
 
 ### 离线评估与局限
 
@@ -159,7 +181,7 @@ python -m unittest discover -s tools/crawler/tests -v
 
 ## 本地启动
 
-需要 Java 21、Maven 3.9+、Node.js 20+、MySQL 8.4 和 Neo4j 5.26。先准备 MySQL 数据库 `red_tourism` 及专用账户 `red_tourism`，设置 `BISHE_MYSQL_PASSWORD`；也可以通过环境变量 `MYSQL_URL`、`MYSQL_USER` 自定义连接。请先启动 Neo4j 并创建本地开发用户 `neo4j`，示例密码为 `local-dev-password`。Docker Compose 启动前须设置 `BISHE_MYSQL_ROOT_PASSWORD` 和 `BISHE_MYSQL_PASSWORD`，两者不应提交到仓库：
+需要 Java 21、Maven 3.9+、Node.js 20+、MySQL 8.4 和 Neo4j 5.26，可选 Redis 7.4。先准备 MySQL 数据库 `red_tourism` 及专用账户 `red_tourism`，设置 `BISHE_MYSQL_PASSWORD`；也可以通过环境变量 `MYSQL_URL`、`MYSQL_USER` 自定义连接。请先启动 Neo4j 并创建本地开发用户 `neo4j`，示例密码为 `local-dev-password`。Docker Compose 启动前须设置 `BISHE_MYSQL_ROOT_PASSWORD` 和 `BISHE_MYSQL_PASSWORD`，两者不应提交到仓库：
 
 ```bash
 docker compose up -d

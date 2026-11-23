@@ -19,6 +19,11 @@ services:
       MYSQL_PASSWORD: "${BISHE_MYSQL_PASSWORD:?Set BISHE_MYSQL_PASSWORD}"
     volumes:
       - mysql_data:/var/lib/mysql
+  redis:
+    image: redis:7.4-alpine
+    ports:
+      - "127.0.0.1:6379:6379"
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
 volumes:
   neo4j_data:
   mysql_data:

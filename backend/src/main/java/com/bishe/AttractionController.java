@@ -1,5 +1,6 @@
 package com.bishe;
 import java.util.Comparator;
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,12 +26,16 @@ public class AttractionController {
     record Request(String region, List<String> themes, @Size(max=10) List<@NotNull @Size(max=100) String> interestIds, @Size(max=10) Map<@NotBlank @Size(max=100) String,@NotNull @Min(1) @Max(3) Integer> profileInterests, @Size(max=100) List<@NotNull @Min(1) Long> favoriteIds, @Size(max=50) List<@NotNull @Min(1) Long> historyIds, @NotNull @Min(1) @Max(20) Integer limit) {}
     private final GraphService graph;
     private final StoryService stories;
-    AttractionController(GraphService graph, StoryService stories) { this.graph=graph; this.stories=stories; }
+    private final RedisCache cache;
+    AttractionController(GraphService graph, StoryService stories, RedisCache cache) { this.graph=graph; this.stories=stories; this.cache=cache; }
     @GetMapping("/attractions") List<GraphService.Attraction> attractions(@RequestParam(required=false) String region) { return graph.attractions(region); }
     @GetMapping("/attractions/{id}/story") StoryService.Story story(@PathVariable long id) { return stories.find(id); }
     @GetMapping("/graph") GraphService.Graph allGraph() { return graph.allGraph(); }
     @GetMapping("/graph/attractions/{id}") GraphService.Graph graph(@PathVariable long id) { return graph.graph(id); }
     @PostMapping("/recommendations") List<Recommendation> recommendations(@Valid @RequestBody Request request) {
+        return cache.get("recommendation",request,new TypeReference<List<Recommendation>>() {},cache.recommendationTtl(),()->calculateRecommendations(request));
+    }
+    private List<Recommendation> calculateRecommendations(Request request) {
         List<String> themes=request.themes()==null?List.of():request.themes();
         List<String> interests=request.interestIds()==null?List.of():request.interestIds().stream().distinct().toList();
         Map<String,Integer> profile=request.profileInterests()==null?Map.of():request.profileInterests();

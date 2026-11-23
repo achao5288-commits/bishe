@@ -1,6 +1,8 @@
 package com.bishe;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
+import java.time.Duration;
 import jakarta.annotation.PostConstruct;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
@@ -35,8 +37,9 @@ public class GraphService implements AutoCloseable {
     private static final Set<String> RELATION_TYPES=Set.of("RELATED_TO_PERSON","PARTICIPATED_IN","RELATED_TO_WORK","BELONGS_TO_THEME");
     private final Driver driver;
     private final ObjectMapper mapper;
-    GraphService(@Value("${NEO4J_URI:bolt://localhost:7687}") String uri, @Value("${NEO4J_USER:neo4j}") String user, @Value("${NEO4J_PASSWORD:local-dev-password}") String password, ObjectMapper mapper) {
-        this.driver=GraphDatabase.driver(uri,AuthTokens.basic(user,password)); this.mapper=mapper;
+    private final RedisCache cache;
+    GraphService(@Value("${NEO4J_URI:bolt://localhost:7687}") String uri, @Value("${NEO4J_USER:neo4j}") String user, @Value("${NEO4J_PASSWORD:local-dev-password}") String password, ObjectMapper mapper, RedisCache cache) {
+        this.driver=GraphDatabase.driver(uri,AuthTokens.basic(user,password)); this.mapper=mapper; this.cache=cache;
     }
     @PostConstruct void seed() throws IOException {
         Seed seed;
@@ -71,6 +74,9 @@ public class GraphService implements AutoCloseable {
         }
     }
     public List<Attraction> attractions(String region) {
+        return cache.get("attractions",region==null?"":region,new TypeReference<List<Attraction>>() {},cache.attractionTtl(),()->loadAttractions(region));
+    }
+    private List<Attraction> loadAttractions(String region) {
         try(Session session=driver.session()){return session.executeRead(tx->tx.run("MATCH (a:Attraction) WHERE $region = '' OR a.region = $region RETURN a ORDER BY a.id",Map.of("region",region==null?"":region)).list(r->{var a=r.get("a");return new Attraction(a.get("id").asLong(),a.get("name").asString(),a.get("region").asString(),a.get("theme").asString(),a.get("description").asString(),a.get("image").asString(),a.get("sourceName").asString(),a.get("sourceUrl").asString(),a.get("aliases").isNull()?List.of():a.get("aliases").asList(v->v.asString()));}));}
     }
     public Map<Long,List<Match>> matchInterests(String region, List<String> interests) {
@@ -103,11 +109,15 @@ public class GraphService implements AutoCloseable {
         return new Graph(new ArrayList<>(nodes.values()),new ArrayList<>(edges.values()));
     }
     public Graph graph(long id){
+        return cache.get("attraction-graph",id,new TypeReference<Graph>() {},cache.graphTtl(),()->loadGraph(id));
+    }
+    private Graph loadGraph(long id){
         try(Session session=driver.session()){return session.executeRead(tx->{
             if(tx.run("MATCH (a:Attraction {id:$id}) RETURN count(a) AS n",Map.of("id",id)).single().get("n").asLong()==0)throw new ResponseStatusException(HttpStatus.NOT_FOUND,"景点不存在");
             return assemble(tx.run("MATCH p=(a:Attraction {id:$id})-[:LOCATED_IN|RELATED_TO_EVENT|RELATED_TO_PERSON|BELONGS_TO_THEME|PARTICIPATED_IN|RELATED_TO_WORK*1..2]->() UNWIND relationships(p) AS r RETURN DISTINCT startNode(r) AS s,endNode(r) AS t,r ORDER BY s.name,t.name",Map.of("id",id)).list());
         });}
     }
-    public Graph allGraph(){try(Session session=driver.session()){return session.executeRead(tx->assemble(tx.run("MATCH (s)-[r:LOCATED_IN|RELATED_TO_EVENT|RELATED_TO_PERSON|BELONGS_TO_THEME|PARTICIPATED_IN|RELATED_TO_WORK]->(t) RETURN s,t,r ORDER BY s.name,t.name LIMIT 500").list()));}}
+    public Graph allGraph(){return cache.get("full-graph","all",new TypeReference<Graph>() {},cache.graphTtl(),this::loadAllGraph);}
+    private Graph loadAllGraph(){try(Session session=driver.session()){return session.executeRead(tx->assemble(tx.run("MATCH (s)-[r:LOCATED_IN|RELATED_TO_EVENT|RELATED_TO_PERSON|BELONGS_TO_THEME|PARTICIPATED_IN|RELATED_TO_WORK]->(t) RETURN s,t,r ORDER BY s.name,t.name LIMIT 500").list()));}}
     @Override public void close(){driver.close();}
 }
